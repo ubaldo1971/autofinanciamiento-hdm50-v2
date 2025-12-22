@@ -12,10 +12,10 @@ const PORT = process.env.PORT || 3000;
 const allowedOrigins = [
     'http://localhost:5173',
     'http://localhost:3000',
-    'https://raiteccop.org',
-    'https://www.raiteccop.org',
-    'http://raiteccop.org',
-    'http://www.raiteccop.org'
+    'https://raitecoop.org',
+    'https://www.raitecoop.org',
+    'http://raitecoop.org',
+    'http://www.raitecoop.org'
 ];
 
 app.use(cors({
