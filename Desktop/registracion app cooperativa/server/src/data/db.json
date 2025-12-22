@@ -1,0 +1,18 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "full_name": "Juan Pérez López",
+      "email": "juan@raite.mx",
+      "password_hash": "123",
+      "birth_date": "1985-05-20",
+      "member_id": "PXLXJU19850519806",
+      "role": "member",
+      "profile_image": "https://via.placeholder.com/150",
+      "created_at": "2025-12-19T23:24:12.794Z"
+    }
+  ],
+  "official_documents": [],
+  "votes": [],
+  "transactions": []
+}
