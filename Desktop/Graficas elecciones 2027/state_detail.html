@@ -2526,11 +2526,13 @@
             }
         }
 
-        // Initialize with default selection
         if (currentId === 'sonora') {
             setMigrantParty('dividido');
             setMCCoalition('independiente');
         }
+
+        // FORCE INITIAL UPDATE to render Badges and Calculations for ALL states
+        updateCareo();
 
         // ============================
         // MUNICIPALITY CHARTS LOGIC
