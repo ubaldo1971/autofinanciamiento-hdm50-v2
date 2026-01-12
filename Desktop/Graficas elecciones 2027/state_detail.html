@@ -2052,7 +2052,7 @@
                 if (imc !== -1) idxMc = imc;
             }
 
-            // 1. Calculate Base Absolute Votes (Scenario Data)
+            // 1. Calculate Base Absolute Votes (Scenario Data) - ALWAYS RECALC FROM SOURCE
             let baseVotesAbs = d.data.map(pct => (pct / 100) * totalBaseVotes);
 
             // 2. Apply MC Coalition Logic to Base Votes
