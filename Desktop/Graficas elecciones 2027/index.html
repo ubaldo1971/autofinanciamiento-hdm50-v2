@@ -1,0 +1,1758 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <meta name="theme-color" content="#0b1020">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="manifest.json">
+  <title>Proyección Electoral 2027 – Panel Ejecutivo</title>
+
+  <!-- Charts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script
+    src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+
+  <style>
+    :root {
+      --bg: #0b1020;
+      --panel: #111a33;
+      --panel2: #0f1730;
+      --text: #e9eefc;
+      --muted: #9fb0da;
+      --border: rgba(255, 255, 255, .09);
+
+      --morena: #d32f2f;
+      --pan: #1565c0;
+      --pri: #2e2e2e;
+      --mc: #ff9800;
+      --otros: #8e9aaf;
+
+      --ok: #2dd4bf;
+      --warn: #fbbf24;
+      --bad: #fb7185;
+      --chip: #1b2751;
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Helvetica Neue", sans-serif;
+      background: radial-gradient(1200px 800px at 20% 0%, #14214a 0%, var(--bg) 55%, #070b16 100%);
+      color: var(--text);
+    }
+
+    header {
+      padding: 24px 20px 10px;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(255, 255, 255, .06), rgba(255, 255, 255, 0));
+    }
+
+    .wrap {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 0 14px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 22px;
+      letter-spacing: .2px
+    }
+
+    .sub {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+      align-items: center;
+    }
+
+    .input,
+    select {
+      background: rgba(255, 255, 255, .05);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 12px;
+      padding: 10px 12px;
+      outline: none;
+      min-width: 220px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, .04);
+      padding: 10px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .pill strong {
+      color: var(--text);
+      font-weight: 600
+    }
+
+    /* GRID LAYOUT UPDATE FOR STICKY BEHAVIOR */
+    .grid {
+      display: grid;
+      gap: 14px;
+      grid-template-columns: 1.2fr .8fr;
+      margin: 14px 0 18px;
+      /* Ensure grid helps us manage height */
+      align-items: start;
+    }
+
+    @media (min-width: 981px) {
+      /* On desktop, we fix the sidebar and scroll the content */
+
+      /* 1. Make the charts stick properly */
+      .card-sticky {
+        position: sticky;
+        top: 20px;
+        z-index: 100;
+        max-height: calc(100vh - 40px);
+        overflow-y: auto;
+      }
+    }
+
+    @media (max-width: 980px) {
+      .grid {
+        grid-template-columns: 1fr
+      }
+    }
+
+    .card {
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, .05), rgba(255, 255, 255, .02));
+      box-shadow: 0 12px 40px rgba(0, 0, 0, .25);
+    }
+
+    .card h2 {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 650;
+      letter-spacing: .2px;
+    }
+
+    .card .head {
+      padding: 14px 14px 8px;
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(255, 255, 255, .02);
+      border-top-left-radius: 18px;
+      border-top-right-radius: 18px;
+    }
+
+    .kpis {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      padding: 12px 14px 14px;
+    }
+
+    @media (max-width: 560px) {
+      .kpis {
+        grid-template-columns: 1fr
+      }
+    }
+
+    .kpi {
+      background: rgba(0, 0, 0, .18);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 10px 12px;
+    }
+
+    .kpi .label {
+      color: var(--muted);
+      font-size: 11px;
+      margin-bottom: 6px
+    }
+
+    .kpi .value {
+      font-size: 16px;
+      font-weight: 700
+    }
+
+    .kpi .hint {
+      color: var(--muted);
+      font-size: 11px;
+      margin-top: 6px;
+      line-height: 1.35
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      padding: 0 14px 14px;
+    }
+
+    @media (max-width: 980px) {
+      .row {
+        grid-template-columns: 1fr
+      }
+    }
+
+    .panel {
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: rgba(0, 0, 0, .18);
+      padding: 12px;
+    }
+
+    .panel h3 {
+      margin: 0 0 10px;
+      font-size: 13px;
+      color: var(--muted);
+      font-weight: 650;
+      letter-spacing: .2px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .tag {
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--chip);
+      color: var(--text);
+      font-weight: 650;
+    }
+
+    .notes {
+      padding: 0 14px 14px;
+    }
+
+    .note {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 10px 12px;
+      background: rgba(0, 0, 0, .18);
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
+    .note strong {
+      color: var(--text)
+    }
+
+    .states {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+
+    @media (max-width: 980px) {
+      .states {
+        grid-template-columns: 1fr
+      }
+    }
+
+    footer {
+      padding: 16px 0 26px;
+      color: var(--muted);
+      font-size: 12px;
+      border-top: 1px solid var(--border);
+      background: rgba(255, 255, 255, .02);
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 10px 14px 0;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      display: inline-block;
+      margin-right: 8px;
+    }
+
+    .legend .item {
+      display: flex;
+      align-items: center;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, .03);
+      font-size: 12px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .small {
+      font-size: 11px;
+      color: var(--muted)
+    }
+
+    .callout {
+      border-left: 3px solid var(--warn);
+      padding: 10px 12px;
+      background: rgba(251, 191, 36, .10);
+      border-radius: 12px;
+      margin-top: 12px;
+      color: var(--text);
+      font-size: 12px;
+      line-height: 1.5;
+      border: 1px solid rgba(251, 191, 36, .30);
+    }
+
+    .callout strong {
+      color: #fff
+    }
+
+    .split {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .btn {
+      cursor: pointer;
+      background: rgba(255, 255, 255, .06);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-weight: 650;
+      font-size: 12px;
+    }
+
+    .btn:hover {
+      background: rgba(255, 255, 255, .10)
+    }
+
+    /* FINAL STICKY FIX */
+    @media (min-width: 768px) {
+      .card-sticky {
+        position: -webkit-sticky !important;
+        position: sticky !important;
+        top: 20px !important;
+        z-index: 1000;
+        max-height: 90vh;
+        overflow-y: auto;
+        align-self: start;
+        /* Critical for grid */
+      }
+    }
+
+    /* RESPONSIVE UPDATES FOR EXECUTIVE CARD */
+    .responsive-kpis {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      padding-bottom: 4px;
+      gap: 10px;
+    }
+
+    .responsive-charts {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      padding: 10px;
+    }
+
+    @media (max-width: 768px) {
+      .responsive-kpis {
+        grid-template-columns: 1fr !important;
+      }
+
+      .responsive-charts {
+        grid-template-columns: 1fr !important;
+      }
+    }
+  </style>
+
+</head>
+
+<body>
+  <header>
+    <div class="wrap">
+      <div style="display:flex; justify-content:space-between; align-items:flex-end;">
+        <div>
+          <h1
+            style="font-size:38px; background:linear-gradient(90deg, #42a5f5, #ab47bc); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; font-weight:800;">
+            EL Oráculo Político</h1>
+          <div class="sub" style="font-size:20px; color:#e0e0e0; margin-top:4px;">
+            Rumbo al 2027. <em>La Madre de las encuestas.</em>
+          </div>
+        </div>
+        <div style="text-align:right;">
+          <h2 style="margin:0; font-size:21px; color:var(--muted); font-weight:500;">Proyección Electoral 2027 – Panel
+            Ejecutivo</h2>
+          <div style="font-size:16px; color:var(--muted); opacity:0.7; margin-top:4px;">
+            <strong>Simulador Estratégico:</strong> Define alianzas y recalcula escenarios.
+          </div>
+        </div>
+      </div>
+
+      <!-- SIMULATION TOOLBAR (Dynamic Alignment) -->
+      <div class="toolbar"
+        style="background:rgba(255,255,255,0.03); padding:16px; border-radius:16px; border:1px solid var(--border); margin-top:14px; display:block;">
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+          <h3 style="margin:0; font-size:14px; color:var(--muted); font-weight:600;">🎛️ Configuración de Alianzas
+            Estratégicas (2027)</h3>
+          <!-- State Selector Button -->
+          <button class="btn"
+            style="background:var(--chip); border-color:var(--ok); color:#fff; padding:4px 10px; font-size:11px;"
+            onclick="toggleStateModal()">
+            📍 Filtrar Estados
+          </button>
+        </div>
+
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:20px;">
+
+          <!-- BLOQUE 1: OFICIALISMO (Core) -->
+          <div
+            style="background:rgba(106, 27, 49, 0.1); border:1px solid rgba(106, 27, 49, 0.3); border-radius:12px; padding:10px;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+              <strong style="color:#ef9a9a; font-size:12px;">NÚCLEO 4T (Izquierda)</strong>
+            </div>
+            <div style="display:flex; flex-wrap:wrap; gap:10px;">
+              <label class="check-box-party"><input type="checkbox" id="chk_morena" checked onchange="updateSim()">
+                Morena</label>
+              <label class="check-box-party"><input type="checkbox" id="chk_pt" checked onchange="updateSim()">
+                PT</label>
+            </div>
+          </div>
+
+          <!-- BLOQUE 2: PARTIDOS BISAGRA / MOVIBLES (Key Request) -->
+          <div
+            style="background:rgba(255, 152, 0, 0.05); border:1px solid rgba(255, 152, 0, 0.2); border-radius:12px; padding:10px;">
+            <div style="margin-bottom:8px; font-size:12px; color:#ffcc80; font-weight:bold;">DEFINICIÓN DE ALIANZAS
+              (Swing)</div>
+
+            <!-- MC -->
+            <div class="swing-row">
+              <span class="party-label" style="color:#ff9800">MC</span>
+              <div class="segmented-control">
+                <label><input type="radio" name="align_mc" value="ofi" onchange="updateSim()"> 4T</label>
+                <label><input type="radio" name="align_mc" value="solo" checked onchange="updateSim()"> Solo</label>
+                <label><input type="radio" name="align_mc" value="opo" onchange="updateSim()"> Opos</label>
+              </div>
+            </div>
+
+            <!-- PVEM (Often 4T, but requested movable) -->
+            <div class="swing-row">
+              <span class="party-label" style="color:#66bb6a">PVEM</span>
+              <div class="segmented-control">
+                <label><input type="radio" name="align_pvem" value="ofi" checked onchange="updateSim()"> 4T</label>
+                <label><input type="radio" name="align_pvem" value="solo" onchange="updateSim()"> Solo</label>
+                <label><input type="radio" name="align_pvem" value="opo" onchange="updateSim()"> Opos</label>
+              </div>
+            </div>
+
+            <!-- LOCALES SONORA (High Priority) -->
+            <div class="swing-row">
+              <span class="party-label" style="color:#d81b60" title="Partido Sonorense (Local)">P.Son</span>
+              <div class="segmented-control">
+                <label><input type="radio" name="align_pson" value="ofi" onchange="updateSim()"> 4T</label>
+                <label><input type="radio" name="align_pson" value="solo" onchange="updateSim()"> Solo</label>
+                <label><input type="radio" name="align_pson" value="opo" checked onchange="updateSim()"> Opos</label>
+              </div>
+            </div>
+
+            <div class="swing-row">
+              <span class="party-label" style="color:#00bcd4" title="Nueva Alianza Sonora">NASon</span>
+              <div class="segmented-control">
+                <label><input type="radio" name="align_nason" value="ofi" onchange="updateSim()"> 4T</label>
+                <label><input type="radio" name="align_nason" value="solo" onchange="updateSim()"> Solo</label>
+                <label><input type="radio" name="align_nason" value="opo" checked onchange="updateSim()"> Opos</label>
+              </div>
+            </div>
+
+            <!-- PES (Strategic Move Request) -->
+            <div class="swing-row">
+              <span class="party-label" style="color:#8e24aa" title="Encuentro Solidario">PES</span>
+              <div class="segmented-control">
+                <label><input type="radio" name="align_pes" value="ofi" onchange="updateSim()"> 4T</label>
+                <label><input type="radio" name="align_pes" value="solo" onchange="updateSim()"> Solo</label>
+                <label><input type="radio" name="align_pes" value="opo" checked onchange="updateSim()"> Opos</label>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- BLOQUE 3: OPOSICIÓN (Core) -->
+          <div
+            style="background:rgba(21, 101, 192, 0.1); border:1px solid rgba(21, 101, 192, 0.3); border-radius:12px; padding:10px;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+              <strong style="color:#90caf9; font-size:12px;">NÚCLEO OPOSITOR (Derecha)</strong>
+            </div>
+            <div style="display:flex; flex-wrap:wrap; gap:10px;">
+              <label class="check-box-party"><input type="checkbox" id="chk_pan" checked onchange="updateSim()">
+                PAN</label>
+              <label class="check-box-party"><input type="checkbox" id="chk_pri" checked onchange="updateSim()">
+                PRI</label>
+              <label class="check-box-party"><input type="checkbox" id="chk_prd" checked onchange="updateSim()">
+                PRD</label>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- SETTINGS FOOTER -->
+        <div
+          style="display:flex; gap:15px; margin-top:12px; border-top:1px solid var(--border); padding-top:10px; align-items:center;">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span class="small">Participación:</span>
+            <select id="sel_turnout" onchange="updateSim()" class="input" style="padding:4px; font-size:12px;">
+              <option value="low">Baja (45%)</option>
+              <option value="med" selected>Media (52%)</option>
+              <option value="high">Alta (62%)</option>
+            </select>
+          </div>
+          <div style="flex:1;"></div>
+          <button class="btn"
+            style="background:var(--panel2); border-color:var(--ok); color:var(--ok); font-size:12px; padding:6px 12px;"
+            onclick="captureSnapshot()">
+            📸 Registrar Escenario
+          </button>
+        </div>
+
+      </div>
+
+      <!-- CSS FOR NEW CONTROLS -->
+      <style>
+        .check-box-party {
+          font-size: 11px;
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          cursor: pointer;
+          user-select: none;
+        }
+
+        .swing-row {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-bottom: 6px;
+        }
+
+        .party-label {
+          font-size: 11px;
+          font-weight: bold;
+          width: 40px;
+        }
+
+        .segmented-control {
+          display: flex;
+          background: rgba(0, 0, 0, 0.3);
+          border-radius: 4px;
+          overflow: hidden;
+          border: 1px solid var(--border);
+        }
+
+        .segmented-control label {
+          font-size: 9px;
+          cursor: pointer;
+          padding: 4px 8px;
+          border-right: 1px solid var(--border);
+          transition: 0.2s;
+          display: flex;
+          align-items: center;
+          gap: 4px;
+        }
+
+        .segmented-control label:last-child {
+          border-right: none;
+        }
+
+        .segmented-control input {
+          display: none;
+        }
+
+        .segmented-control label:has(input:checked) {
+          background: rgba(255, 255, 255, 0.15);
+          color: #fff;
+          font-weight: bold;
+        }
+
+        /* Specific Colors for Active States in Segmented Control */
+        .segmented-control label:has(input[value="ofi"]:checked) {
+          background: #6a1b31;
+          color: #ffcdd2;
+        }
+
+        .segmented-control label:has(input[value="opo"]:checked) {
+          background: #1565c0;
+          color: #bbdefb;
+        }
+
+        .segmented-control label:has(input[value="solo"]:checked) {
+          background: #424242;
+          color: #fff;
+        }
+      </style>
+
+      <!-- GENDER SUMMARY TICKER -->
+      <div style="margin-top:10px; border-top:1px solid var(--border); padding-top:8px;">
+        <div
+          style="font-size:13px; color:var(--muted); display:flex; gap:15px; flex-wrap:wrap; align-items:center; line-height:1.6;">
+          <span style="display:flex; align-items:center; gap:4px;">🗳️ <strong style="color:var(--text)">17
+              Estados</strong></span>
+          <span style="height:14px; width:1px; background:var(--border)"></span>
+          <span id="summGender" style="color:var(--text)"></span>
+          <span style="height:14px; width:1px; background:var(--border)"></span>
+          <span style="color:#ef9a9a">Mujeres Puntean en:</span>
+          <span id="summFemaleLeaders" style="color:#fff; font-weight:500;"></span>
+        </div>
+      </div>
+  </header>
+
+  <main class="wrap" style="overflow:visible;">
+    <div class="grid">
+      <!-- LEFT: Overview -->
+      <section class="card card-sticky">
+        <div class="head">
+          <h2>Resumen Agregado (Simulación)</h2>
+          <span class="tag">Vista Ejecutiva</span>
+        </div>
+
+        <div class="kpis responsive-kpis">
+          <div class="kpi">
+            <div class="label">Total Estados (Ganados)</div>
+            <div class="value" id="kpi_states_summary" style="font-size:14px;">-</div>
+          </div>
+          <div class="kpi">
+            <div class="label">Voto Popular Est. (3 bloques)</div>
+            <div class="value" id="kpi_total_votes">-</div>
+          </div>
+        </div>
+
+        <!-- CHARTS CONTAINER (Compacted ~50%) -->
+        <div class="responsive-charts">
+
+          <!-- Chart 1: Doughnut (Gubernaturas) -->
+          <div style="height:140px; position:relative;">
+            <div id="chartTitleOverall" class="small" style="position:absolute; top:0; left:0; font-size:10px;">
+              Gubernaturas por Bloque</div>
+            <canvas id="chartOverall"></canvas>
+          </div>
+
+          <!-- Chart 2: Stacked Bars (Voto Popular) -->
+          <div style="height:140px; position:relative;">
+            <div class="small"
+              style="position:absolute; top:0; left:0; z-index:10; background:rgba(17,26,51,0.9); padding:0 4px; border-radius:4px; font-size:10px;">
+              Fuerza por Partido
+            </div>
+            <canvas id="chartParties" style="margin-top:14px;"></canvas>
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- RIGHT: SCROLLABLE COLUMN -->
+      <div style="display:flex; flex-direction:column; gap:20px;">
+
+        <!-- NEW: TRANSITION ANALYSIS -->
+        <section class="card">
+          <div class="head">
+            <h2>Transición de Poder (Actual vs 2027)</h2>
+          </div>
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
+            <!-- Chart 1: Current -->
+            <div style="text-align:center;">
+              <h4 style="font-size:11px; color:var(--muted); margin-bottom:10px; uppercase;">Mapa Actual (2026)</h4>
+              <div style="height:160px; position:relative;">
+                <canvas id="chartCurrentGov"></canvas>
+              </div>
+            </div>
+            <!-- Chart 2: Projected -->
+            <div style="text-align:center;">
+              <h4 style="font-size:11px; color:#fff; margin-bottom:10px; font-weight:bold; uppercase;">Proyección 2027
+                (Simulación)</h4>
+              <div style="height:160px; position:relative;">
+                <canvas id="chartProjectedGov"></canvas>
+              </div>
+            </div>
+          </div>
+          <div style="margin-top:15px; font-size:10px; color:var(--muted); text-align:center;">
+            *La proyección se actualiza en tiempo real según los ajustes del tablero.
+          </div>
+        </section>
+
+      </div> <!-- End Right Column Wrapper -->
+    </div>
+
+  </main>
+
+  <!-- 1. SCORECARD TABLE (Collapsible & Full Width) -->
+  <section
+    style="width:100%; background:#131a29; border-top:1px solid var(--border); padding:20px 40px; box-sizing:border-box;">
+
+    <!-- Header / Toggle -->
+    <div onclick="toggleScorecard()"
+      style="display:flex; justify-content:space-between; align-items:center; cursor:pointer; margin-bottom:20px; user-select:none;">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <h2 style="font-size:20px; font-weight:700; margin:0; color:#fff;">Tablero de Control (Estados Clave)</h2>
+        <button class="btn" onclick="event.stopPropagation(); toggleStateModal()"
+          style="font-size:11px; padding:4px 10px;">+ Agregar/Quitar</button>
+      </div>
+      <div id="scorecardIcon"
+        style="font-size:20px; color:var(--muted); transition:transform 0.3s; transform: rotate(180deg);">▼</div>
+    </div>
+
+    <!-- Collapsible Content -->
+    <div id="scorecardWrapper" style="display:block; transition:all 0.3s;">
+      <div id="scorecardGrid"
+        style="display:grid; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); gap:15px;">
+        <!-- JS Populated (Cards) -->
+      </div>
+    </div>
+  </section>
+
+  <script>
+    function toggleScorecard() {
+      const wrap = document.getElementById('scorecardWrapper');
+      const icon = document.getElementById('scorecardIcon');
+      if (wrap.style.display === 'none') {
+        wrap.style.display = 'block';
+        icon.style.transform = 'rotate(180deg)';
+      } else {
+        wrap.style.display = 'none';
+        icon.style.transform = 'rotate(0deg)';
+      }
+    }
+  </script>
+
+  <!-- 2. STATE BREAKDOWN (Collapsible & Full Width) -->
+  <section
+    style="width:100%; background:#0f172a; border-top:1px solid var(--border); padding:20px 40px; box-sizing:border-box;">
+
+    <!-- Header / Toggle -->
+    <div onclick="toggleStateGrid()"
+      style="display:flex; justify-content:space-between; align-items:center; cursor:pointer; margin-bottom:20px; user-select:none;">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <h2 style="font-size:20px; font-weight:700; margin:0; color:#fff;">Desglose por Estado (17 Gubernaturas)</h2>
+        <div
+          style="background:rgba(255,255,255,0.1); padding:4px 10px; border-radius:12px; font-size:11px; color:var(--muted)">
+          Click para desplegar
+        </div>
+      </div>
+      <div id="stateGridIcon"
+        style="font-size:20px; color:var(--muted); transition:transform 0.3s; transform: rotate(180deg);">▼</div>
+    </div>
+
+    <!-- Collapsible Content -->
+    <div id="stateGridWrapper" style="display:block; transition:all 0.3s;">
+      <!-- Responsive Grid (2 Columns on Desktop) -->
+      <div id="cardsContainer"
+        style="display:grid; grid-template-columns: repeat(auto-fill, minmax(450px, 1fr)); gap:20px;">
+        <!-- JS Populated -->
+      </div>
+    </div>
+  </section>
+
+  <script>
+    function toggleStateGrid() {
+      const wrap = document.getElementById('stateGridWrapper');
+      const icon = document.getElementById('stateGridIcon');
+      if (wrap.style.display === 'none') {
+        wrap.style.display = 'block';
+        icon.style.transform = 'rotate(180deg)';
+      } else {
+        wrap.style.display = 'none';
+        icon.style.transform = 'rotate(0deg)';
+      }
+    }
+  </script>
+
+  <!-- 3. HISTORY SECTION (Full Width) -->
+  <section
+    style="width:100%; background:#131a29; border-top:1px solid var(--border); padding:20px 40px; box-sizing:border-box;">
+    <div
+      style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:15px;">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <h2 style="font-size:20px; font-weight:700;">Histórico de Escenarios</h2>
+        <select id="historyFilter" class="input"
+          style="padding:4px 8px; font-size:12px; min-width:140px; background:rgba(0,0,0,0.3); border:1px solid var(--border);"
+          onchange="renderHistoryTable()">
+          <option value="session">Sesión Actual</option>
+          <option value="historical">Histórico (Desde Ene 2026)</option>
+        </select>
+      </div>
+      <span class="tag" style="background:rgba(255,255,255,0.05); color:var(--muted)">Registro y Tendencias</span>
+    </div>
+
+    <div style="overflow-x:auto;">
+      <table style="width:100%; border-collapse:collapse; font-size:13px;">
+        <thead>
+          <tr
+            style="text-align:left; color:var(--muted); border-bottom:1px solid var(--border); background:rgba(255,255,255,0.02)">
+            <th style="padding:10px;">Fecha / Evento</th>
+            <th style="padding:10px;">Configuración Clave</th>
+            <th style="padding:10px;">Líder Global (Estados)</th>
+            <th style="padding:10px;">Margen Popular (Gap)</th>
+            <th style="padding:10px;">Tendencia (vs Anterior)</th>
+          </tr>
+        </thead>
+        <tbody id="historyTableBody">
+          <!-- Rows -->
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 5. FOOTER (Moved Outside Main for Full Width) -->
+  <footer
+    style="width:100%; padding:25px 20px; border-top:1px solid var(--border); background:rgba(10,14,23,0.95); font-size:12px; color:var(--muted); text-align:center; box-sizing:border-box;">
+    <div style="margin-bottom:10px;">
+      <strong
+        style="color:#64748b; text-transform:uppercase; letter-spacing:1px; margin-right:5px;">Metodología:</strong>
+      Consolidado de Encuestas Estatales (Promedio Ponderado) • Datos INE Lista Nominal • Proyección Voto Extranjero
+    </div>
+    <div style="opacity:0.7; margin-bottom:10px; max-width:800px; margin-left:auto; margin-right:auto;">
+      Fuentes Monitorizadas: Massive Caller, Rubrum, Consulta Mitofsky, El Financiero, Parametría, Enkoll, Varela y
+      Asociados, GobernArte.
+    </div>
+    <div style="opacity:0.5; font-family:'Courier New', monospace;">
+      Corte Informativo: Enero 2026 | simulador.elecciones.mx
+    </div>
+  </footer>
+
+
+
+  <!-- MODAL STATE SELECTOR -->
+  <div id="modalStates"
+    style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.8); z-index:100; align-items:center; justify-content:center;">
+    <div class="card" style="width:90%; max-width:600px; max-height:80vh; display:flex; flex-direction:column;">
+      <div class="head">
+        <h2>Seleccionar Estados (Elecciones 2027)</h2>
+        <button class="btn" onclick="toggleStateModal()">Cerrar</button>
+      </div>
+      <div style="padding:14px; overflow-y:auto; flex:1;" id="stateListContainer">
+        <!-- Checkboxes -->
+      </div>
+      <div style="padding:14px; border-top:1px solid var(--border); text-align:right;">
+        <button class="btn primary" onclick="toggleStateModal()">Aplicar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+  <script>
+    // ========= CONFIG =========
+    Chart.register(ChartDataLabels);
+    Chart.defaults.font.family = 'ui-sans-serif, system-ui, sans-serif';
+    Chart.defaults.color = '#9fb0da';
+
+    // Formatting Helpers
+    const fmtNum = (n) => new Intl.NumberFormat('es-MX').format(Math.floor(n));
+    // User requested full digits for visibility (e.g. 7,123,456 instead of 7.1M)
+    const fmtCompact = (n) => new Intl.NumberFormat('es-MX').format(Math.floor(n));
+    const COLORS = {
+      morena: '#6a1b31', pan: '#1565c0', pri: '#e53935', mc: '#ff9800', pvem: '#4caf50',
+      oficial: '#6a1b31', oposicion: '#1565c0',
+      neutral: '#64748b'
+    };
+
+    // ==========================================
+    // 🧠 EL CEREBRO DEL ORÁCULO: CLASIFICACIÓN IDEOLÓGICA (2026)
+    // ==========================================
+    const PARTIES_DB = {
+      // 🔴 ALA IZQUIERDA / PROGRESISTA
+      "morena": {
+        nombre: "Morena",
+        ala: "izquierda",
+        tipo: "nacional", // Núcleo duro
+        bloque: "4T",
+        ideologia_score: -1.0, // Izquierda nacional-popular
+        peso_electoral: "alto",
+        transferencia_voto: "alta",
+        color: "#6a1b31"
+      },
+      "pt": {
+        nombre: "Partido del Trabajo",
+        ala: "izquierda",
+        tipo: "nacional",
+        bloque: "4T",
+        ideologia_score: -0.9, // Izquierda socialista
+        peso_electoral: "medio",
+        transferencia_voto: "media",
+        color: "#d32f2f"
+      },
+      "pvem": {
+        nombre: "PVEM",
+        ala: "izquierda_aliada",
+        tipo: "nacional", // Pragmática
+        bloque: "4T",
+        ideologia_score: -0.5, // Pragmática / Oportunista
+        peso_electoral: "medio",
+        transferencia_voto: "media",
+        color: "#4caf50"
+      },
+      "prd": {
+        nombre: "PRD",
+        ala: "izquierda_residual",
+        tipo: "nacional",
+        bloque: "indefinido", // Izquierda socialdemócrata
+        ideologia_score: -0.6,
+        peso_electoral: "muy_bajo",
+        transferencia_voto: "muy_baja",
+        color: "#ffca28"
+      },
+      "pes": {
+        nombre: "Encuentro Solidario",
+        ala: "izquierda_aliada", // A veces juega con 4T localmente (Baja California)
+        tipo: "nacional/local",
+        bloque: "variable",
+        ideologia_score: +0.2, // Conservador social pero aliado político
+        peso_electoral: "bajo",
+        transferencia_voto: "baja",
+        color: "#8e24aa"
+      },
+
+      // 🔵 ALA DERECHA / OPOSITORA
+      "pan": {
+        nombre: "PAN",
+        ala: "derecha",
+        tipo: "nacional", // Derecha institucional
+        bloque: "oposicion",
+        ideologia_score: +1.0, // Derecha liberal / conservadora
+        peso_electoral: "alto",
+        transferencia_voto: "media-alta",
+        color: "#1565c0"
+      },
+      "pri": {
+        nombre: "PRI",
+        ala: "derecha",
+        tipo: "nacional",
+        bloque: "oposicion",
+        ideologia_score: +0.7, // Centro-derecha corporativo
+        peso_electoral: "medio",
+        transferencia_voto: "media",
+        color: "#e53935"
+      },
+      "mc": {
+        nombre: "Movimiento Ciudadano",
+        ala: "centro_derecha",
+        tipo: "nacional", // Derecha liberal / urbana
+        bloque: "oposicion", // O tercera vía
+        ideologia_score: +0.3, // Liberal-progresista
+        peso_electoral: "medio",
+        transferencia_voto: "baja-media",
+        color: "#ff9800"
+      },
+
+      // 🟨 DERECHA LOCAL (CLAVE PARA SONORA)
+      "pson": {
+        nombre: "Partido Sonorense",
+        ala: "derecha_local",
+        tipo: "local",
+        bloque: "oposicion",
+        ideologia_score: +0.6, // Regionalista / anti-centro
+        peso_electoral: "bajo",
+        transferencia_voto: "alta", // Voto duro local
+        riesgo_volatilidad: "alto", // Puede caerse si pierde registro
+        color: "#d81b60"
+      },
+      "nason": {
+        nombre: "Nueva Alianza Sonora",
+        ala: "derecha_aliada", // A veces juega con poder, hoy opositor o bisagra
+        tipo: "local",
+        bloque: "oposicion", // O aliado magisterial
+        ideologia_score: +0.5, // Corporativa
+        peso_electoral: "bajo-medio",
+        transferencia_voto: "media",
+        color: "#00bcd4"
+      }
+    };
+
+    // Full DB: Estados con elección de GOBERNADOR en 2027 (17 estados)
+    // Se ha actualizado la estructura baseProb para permitir campos extendidos como 'local_right' (pson/nason)
+    const ALL_STATES = [
+      { id: "aguascalientes", name: "Aguascalientes", ln: 1100000, leadingGender: 'M', curr: 'pan', baseProb: { morena: 30, pt: 2, pvem: 3, pan: 35, pri: 7, mc: 8, prd: 0, otros: 15 } },
+      { id: "bajacalifornia", name: "Baja California", ln: 3200000, leadingGender: 'F', curr: 'morena', baseProb: { morena: 40, pt: 3, pvem: 3, pan: 25, pri: 7, mc: 8, prd: 0, pes: 4, otros: 10 } },
+      { id: "bcs", name: "Baja California Sur", ln: 620000, leadingGender: 'F', curr: 'morena', baseProb: { morena: 38, pt: 3, pvem: 3, pan: 25, pri: 5, mc: 10, prd: 0, otros: 16 } },
+      { id: "campeche", name: "Campeche", ln: 720000, leadingGender: 'M', curr: 'morena', baseProb: { morena: 45, pt: 2, pvem: 3, pan: 5, pri: 20, mc: 8, prd: 0, otros: 17 } },
+      { id: "chihuahua", name: "Chihuahua", ln: 3300000, leadingGender: 'F', curr: 'pan', baseProb: { morena: 40, pt: 2, pvem: 2, pan: 30, pri: 8, mc: 5, prd: 0, otros: 13 } },
+      { id: "colima", name: "Colima", ln: 610000, leadingGender: 'M', curr: 'morena', baseProb: { morena: 38, pt: 2, pvem: 2, pan: 10, pri: 25, mc: 10, prd: 0, otros: 13 } },
+      { id: "guerrero", name: "Guerrero", ln: 2700000, leadingGender: 'M', curr: 'morena', baseProb: { morena: 48, pt: 2, pvem: 2, pan: 5, pri: 20, mc: 8, prd: 0, otros: 15 } },
+      { id: "michoacan", name: "Michoacán", ln: 3800000, leadingGender: 'M', curr: 'morena', baseProb: { morena: 40, pt: 3, pvem: 2, pan: 20, pri: 10, mc: 10, prd: 0, otros: 15 } },
+      { id: "nayarit", name: "Nayarit", ln: 950000, leadingGender: 'F', curr: 'morena', baseProb: { morena: 40, pt: 2, pvem: 2, pan: 10, pri: 20, mc: 10, prd: 0, otros: 16 } },
+      { id: "nuevoleon", name: "Nuevo León", ln: 4800000, leadingGender: 'M', curr: 'mc', baseProb: { morena: 22, pt: 1, pvem: 2, pan: 15, pri: 17, mc: 38, prd: 0, otros: 5 } },
+      { id: "queretaro", name: "Querétaro", ln: 2000000, leadingGender: 'M', curr: 'pan', baseProb: { morena: 35, pt: 1, pvem: 2, pan: 35, pri: 7, mc: 8, prd: 0, otros: 12 } },
+      { id: "quintanaroo", name: "Quintana Roo", ln: 1800000, leadingGender: 'F', curr: 'morena', baseProb: { morena: 42, pt: 2, pvem: 2, pan: 25, pri: 7, mc: 10, prd: 0, otros: 12 } },
+      { id: "sanl-potosi", name: "San Luis Potosí", ln: 2200000, leadingGender: 'F', curr: 'pvem', baseProb: { morena: 5, pt: 2, pvem: 33, pan: 25, pri: 10, mc: 10, prd: 0, otros: 15 } },
+      { id: "sinaloa", name: "Sinaloa", ln: 2500000, leadingGender: 'F', curr: 'morena', baseProb: { morena: 44, pt: 2, pvem: 2, pan: 15, pri: 13, mc: 10, prd: 0, otros: 14 } },
+      {
+        id: "sonora",
+        name: "Sonora",
+        ln: 2400000,
+        leadingGender: 'F',
+        curr: 'morena',
+        // 🟨 Ajuste con Partidos Locales
+        baseProb: { morena: 35, pt: 3, pvem: 2, pan: 20, pri: 8, mc: 12, prd: 0, pson: 5, nason: 3, otros: 12 }
+      },
+      { id: "tlaxcala", name: "Tlaxcala", ln: 1100000, leadingGender: 'F', curr: 'morena', baseProb: { morena: 40, pt: 3, pvem: 2, pan: 20, pri: 12, mc: 10, prd: 5, otros: 8 } },
+      { id: "zacatecas", name: "Zacatecas", ln: 1300000, leadingGender: 'F', curr: 'morena', baseProb: { morena: 45, pt: 3, pvem: 2, pan: 15, pri: 10, mc: 10, prd: 0, otros: 15 } }
+    ];
+
+    let activeStateIds = ["aguascalientes", "bajacalifornia", "bcs", "campeche", "chihuahua", "colima", "guerrero", "michoacan", "nayarit", "nuevoleon", "queretaro", "quintanaroo", "sanl-potosi", "sinaloa", "sonora", "tlaxcala", "zacatecas"];
+
+    // 15 States NOT having governor elections in 2027 (Fixed Status for Projection)
+    const NON_ELECTION_STATES = [
+      { name: "CDMX", curr: "morena" },
+      { name: "Chiapas", curr: "morena" },
+      { name: "Guanajuato", curr: "pan" },
+      { name: "Jalisco", curr: "mc" },
+      { name: "Morelos", curr: "morena" },
+      { name: "Puebla", curr: "morena" },
+      { name: "Tabasco", curr: "morena" },
+      { name: "Veracruz", curr: "morena" },
+      { name: "Yucatán", curr: "morena" },
+      { name: "Coahuila", curr: "pri" },
+      { name: "Estado de México", curr: "morena" },
+      { name: "Hidalgo", curr: "morena" },
+      { name: "Oaxaca", curr: "morena" },
+      { name: "Tamaulipas", curr: "morena" },
+      { name: "Durango", curr: "pri" }
+    ];
+
+    // Init Summary Header
+    (function initSummary() {
+      const total = ALL_STATES.length;
+      const women = ALL_STATES.filter(s => s.leadingGender === 'F');
+      const men = ALL_STATES.filter(s => s.leadingGender === 'M');
+
+      const summGender = document.getElementById('summGender');
+      if (summGender) summGender.innerText = `Candidatos(as) Líderes: ${women.length} Mujeres / ${men.length} Hombres`;
+
+      const wNames = women.map(s => {
+        let maxP = -1;
+        let leader = 'neutral';
+        for (const [p, val] of Object.entries(s.baseProb)) {
+          if (val > maxP) { maxP = val; leader = p; }
+        }
+        let color = COLORS[leader] || '#fff';
+        if (leader === 'pt') color = '#e53935';
+        if (leader === 'pvem') color = '#4caf50';
+
+        return `<span style="color:${color}; font-weight:600;">${s.name}</span>`;
+      }).join(', ');
+
+      const listVal = document.getElementById('summFemaleLeaders');
+      if (listVal) listVal.innerHTML = wNames;
+    })();
+
+    // Calc Helper
+    function calculateSim(state) {
+      // 1. Get Turnout Factor
+      const turnoutMode = document.getElementById("sel_turnout").value;
+
+      let turnoutPct = 0.53; // Base Medium
+      let biasOfi = 1.0;
+      let biasOpo = 1.0;
+
+      // Scenarios
+      if (turnoutMode === "low") {
+        turnoutPct = 0.45;
+        biasOfi = 1.03; // Base mobilization favors Ofi
+      } else if (turnoutMode === "high") {
+        turnoutPct = 0.62;
+        biasOpo = 1.04; // Anti-incumbent vote
+      }
+
+      // 2. Get Alliance Config (Dynamic)
+
+      // -- CORES --
+      const chkMorena = document.getElementById("chk_morena")?.checked;
+      const chkPt = document.getElementById("chk_pt")?.checked;
+      const chkPan = document.getElementById("chk_pan")?.checked;
+      const chkPri = document.getElementById("chk_pri")?.checked;
+      const chkPrd = document.getElementById("chk_prd")?.checked;
+
+      // -- SWINGS --
+      const alignMc = document.querySelector('input[name="align_mc"]:checked')?.value || 'solo';
+      const alignPvem = document.querySelector('input[name="align_pvem"]:checked')?.value || 'ofi';
+      const alignPson = document.querySelector('input[name="align_pson"]:checked')?.value || 'opo'; // Default Opo per prompt
+      const alignNason = document.querySelector('input[name="align_nason"]:checked')?.value || 'opo';
+      const alignPes = document.querySelector('input[name="align_pes"]:checked')?.value || 'opo';
+
+      // 3. Sum Probabilities (Raw %)
+      const p = state.baseProb;
+      const totalVotes = state.ln * turnoutPct;
+
+      function getVotes(partyKey) {
+        if (!p[partyKey]) return 0;
+        return (p[partyKey] / 100) * totalVotes;
+      }
+
+      // Individual Votes Calc
+      const vMorena = getVotes("morena");
+      const vPt = getVotes("pt");
+      const vPvem = getVotes("pvem");
+      const vPan = getVotes("pan");
+      const vPri = getVotes("pri");
+      const vPrd = getVotes("prd");
+      const vPes = getVotes("pes");
+      const vMc = getVotes("mc");
+      const vPson = getVotes("pson"); // Will be 0 for non-Sonora
+      const vNason = getVotes("nason"); // Will be 0 for non-Sonora
+      const vOtros = getVotes("otros");
+
+      // ALLIANCE BUCKETS
+      let votesOfficial = 0;
+      let votesOpposition = 0;
+      let votesMcSolo = 0;
+
+      // -- ALLOCATION LOGIC --
+
+      // Core 4T
+      if (chkMorena) votesOfficial += vMorena;
+      if (chkPt) votesOfficial += vPt;
+
+      // Core Opos
+      if (chkPan) votesOpposition += vPan;
+      if (chkPri) votesOpposition += vPri;
+      if (chkPrd) votesOpposition += vPrd;
+
+      // Swings: PVEM
+      if (alignPvem === 'ofi') votesOfficial += vPvem;
+      else if (alignPvem === 'opo') votesOpposition += vPvem;
+      // else 'solo' -> ignored for bloc totals but counts for winner check if solo wins (unlikely)
+
+      // Swings: MC
+      if (alignMc === 'ofi') votesOfficial += vMc;
+      else if (alignMc === 'opo') votesOpposition += vMc;
+      else votesMcSolo += vMc;
+
+      // Swings: Locals (Sonora)
+      if (alignPson === 'ofi') votesOfficial += vPson;
+      else if (alignPson === 'opo') votesOpposition += vPson;
+      // else solo
+
+      if (alignNason === 'ofi') votesOfficial += vNason;
+      else if (alignNason === 'opo') votesOpposition += vNason;
+      // else solo
+
+      // Swings: PES
+      if (alignPes === 'ofi') votesOfficial += vPes;
+      else if (alignPes === 'opo') votesOpposition += vPes;
+      // else solo
+
+
+      // Base Bias application
+      votesOfficial *= biasOfi;
+      votesOpposition *= biasOpo;
+
+      // Compare
+      let winnerLabel = "Oficialismo";
+      let winnerColor = COLORS.oficial;
+      let winnerVotes = votesOfficial;
+      let runnerUpVotes = Math.max(votesOpposition, votesMcSolo);
+
+      // Check MC Solo Win (Nuevo Leon case)
+      if (votesMcSolo > votesOfficial && votesMcSolo > votesOpposition) {
+        winnerLabel = "MC";
+        winnerColor = COLORS.mc;
+        winnerVotes = votesMcSolo;
+        runnerUpVotes = Math.max(votesOfficial, votesOpposition);
+      } else if (votesOpposition > votesOfficial) {
+        winnerLabel = "Oposición";
+        winnerColor = COLORS.oposicion;
+        winnerVotes = votesOpposition;
+        runnerUpVotes = Math.max(votesOfficial, votesMcSolo);
+      } else {
+        // Oficialismo Wins
+        winnerLabel = "Oficialismo";
+        winnerColor = COLORS.oficial;
+        winnerVotes = votesOfficial;
+
+        // SPECIAL CASE: San Luis Potosí (Green Party / PVEM Domination)
+        // If PVEM contributes more than Morena, set label to Verde
+        if (vPvem > vMorena) {
+          winnerLabel = "PVEM (Verde)";
+          winnerColor = COLORS.pvem; // Needs to be defined in COLORS
+        }
+      }
+
+      const margin = winnerVotes - runnerUpVotes;
+      const totalSimVotes = votesOfficial + votesOpposition + votesMcSolo + vOtros; // Approximation
+
+      return {
+        id: state.id,
+        name: state.name,
+        ln: state.ln,
+        turnoutPct,
+        totalVotes: totalSimVotes,
+
+        // Return EFFECTIVE votes for the "Scorecard"
+        vOfficial: votesOfficial,
+        vOpposition: votesOpposition,
+        vMc: votesMcSolo,
+
+        // Return BREAKDOWN (Raw) for Stacked Char
+        breakdown: {
+          morena: (chkMorena ? vMorena : 0) * biasOfi,
+          pt: (chkPt ? vPt : 0) * biasOfi,
+          pvem: (alignPvem !== 'solo' ? vPvem : 0), // Simplifying for chart stacks
+          pan: (chkPan ? vPan : 0) * biasOpo,
+          pri: (chkPri ? vPri : 0) * biasOpo,
+          mc: (alignMc !== 'solo' ? 0 : vMc) // If aligned, it's absorbed in blocks for simplicity of this chart, or we should show it? 
+          // Actually chart reflects Bloc strength. If MC is allied, it should ideally show in that stack.
+          // Correct implementation for chartParties later:
+          // We will render raw contributions to Blocs.
+        },
+        // Detailed breakdown for rendering chart properly
+        rawBreakdown: {
+          morena: vMorena, pt: vPt, pvem: vPvem, pan: vPan, pri: vPri, prd: vPrd,
+          mc: vMc, pson: vPson, nason: vNason, pes: vPes, otros: vOtros
+        },
+
+        winnerLabel,
+        winnerColor,
+        winnerVotes,
+        margin
+      };
+    }
+
+    let chartOverall = null;
+    let chartParties = null;
+
+    function updateSim() {
+      const activeStates = ALL_STATES.filter(s => activeStateIds.includes(s.id));
+      const results = activeStates.map(calculateSim);
+
+
+      // 1. Simulation Counters (17 Election States)
+      let simWinsOficial = 0;
+      let simWinsOpo = 0;
+      let simWinsMc = 0;
+      let simWinsPvem = 0;
+
+      // 2. Total Projection Counters (32 States) - Start with Non-Election
+      let totalWinsOficial = 0;
+      let totalWinsOpo = 0;
+      let totalWinsMc = 0;
+      let totalWinsPvem = 0;
+
+      NON_ELECTION_STATES.forEach(s => {
+        if (s.curr === 'morena') totalWinsOficial++;
+        else if (['pan', 'pri'].includes(s.curr)) totalWinsOpo++;
+        else if (s.curr === 'mc') totalWinsMc++;
+        else if (s.curr === 'pvem') totalWinsPvem++;
+      });
+
+      let sumOficial = 0;
+      let sumOpo = 0;
+      let sumMc = 0;
+
+      // Party Breakdown Sums for Chart
+      let sumMorena = 0, sumPan = 0, sumPri = 0, sumPt = 0, sumGreen = 0, sumMcSolo = 0;
+
+      results.forEach(r => {
+        // Update Simulation Counts
+        if (r.winnerLabel === "Oficialismo") { simWinsOficial++; totalWinsOficial++; }
+        else if (r.winnerLabel === "Oposición") { simWinsOpo++; totalWinsOpo++; }
+        else if (r.winnerLabel === "PVEM (Verde)") { simWinsPvem++; totalWinsPvem++; }
+        else { simWinsMc++; totalWinsMc++; }
+
+        sumOficial += r.vOfficial;
+        sumOpo += r.vOpposition;
+        sumMc += r.vMc; // Solo MC
+      });
+
+      // Update KPI (Summary shows ONLY Election States)
+      const kpiStates = document.getElementById("kpi_states_summary");
+      if (kpiStates) {
+        if (simWinsPvem > 0) {
+          kpiStates.innerHTML = `<span style="color:${COLORS.oficial}">${simWinsOficial}</span> - <span style="color:${COLORS.oposicion}">${simWinsOpo}</span> - <span style="color:${COLORS.mc}">${simWinsMc}</span> - <span style="color:${COLORS.pvem}">${simWinsPvem}</span>`;
+        } else {
+          kpiStates.innerHTML = `<span style="color:${COLORS.oficial}">${simWinsOficial}</span> - <span style="color:${COLORS.oposicion}">${simWinsOpo}</span> - <span style="color:${COLORS.mc}">${simWinsMc}</span>`;
+        }
+      }
+
+      // --- CÁLCULO DE MARGEN DE ERROR (Muy Fino) ---
+      // Metodología: Agregación de varianzas estocásticas independientes.
+      // Se asume n=1200 por estado (estándar de alta confiabilidad).
+      const N_SAMPLE = 1200;
+      const Z_SCORE = 1.96; // 95% Confianza
+
+      let varOficial = 0;
+      let varOpo = 0;
+      let varMc = 0;
+      let grandTotalVotes = 0;
+
+      results.forEach(r => {
+        grandTotalVotes += r.totalVotes;
+        if (r.totalVotes > 0) {
+          // Proporciones en este estado
+          const pOfi = r.vOfficial / r.totalVotes;
+          const pOpo = r.vOpposition / r.totalVotes;
+          const pMc = r.vMc / r.totalVotes;
+
+          // Varianza del VOTO TOTAL en este estado (Var = Total^2 * p(1-p)/n)
+          // Usamos corrección de población finita (ignorada por LN > n)
+          const stateWeightSq = r.totalVotes * r.totalVotes;
+
+          varOficial += (stateWeightSq * (pOfi * (1 - pOfi))) / N_SAMPLE;
+          varOpo += (stateWeightSq * (pOpo * (1 - pOpo))) / N_SAMPLE;
+          varMc += (stateWeightSq * (pMc * (1 - pMc))) / N_SAMPLE;
+        }
+      });
+
+      // Error Estándar Nacional (en Votos)
+      const seOficial = Math.sqrt(varOficial);
+      const seOpo = Math.sqrt(varOpo);
+      const seMc = Math.sqrt(varMc);
+
+      // MoE en Votos
+      const moeOficialVotes = Z_SCORE * seOficial;
+      const moeOpoVotes = Z_SCORE * seOpo;
+      const moeMcVotes = Z_SCORE * seMc;
+
+      // MoE en Porcentaje (base Nacional)
+      const moeOficialPct = ((moeOficialVotes / grandTotalVotes) * 100).toFixed(2);
+      const moeOpoPct = ((moeOpoVotes / grandTotalVotes) * 100).toFixed(2);
+      const moeMcPct = ((moeMcVotes / grandTotalVotes) * 100).toFixed(2);
+
+
+      const kpiVotes = document.getElementById("kpi_total_votes");
+      if (kpiVotes) kpiVotes.innerHTML =
+        `<div style="font-size:11px; display:flex; flex-direction:column; gap:2px;">
+           <div style="display:flex; justify-content:space-between; gap:10px;">
+              <span style="color:${COLORS.oficial}">Of: <strong>${fmtCompact(sumOficial)}</strong> <span style="opacity:0.7; font-size:9px;">(±${moeOficialPct}%)</span></span>
+              <span style="color:${COLORS.oposicion}">Op: <strong>${fmtCompact(sumOpo)}</strong> <span style="opacity:0.7; font-size:9px;">(±${moeOpoPct}%)</span></span>
+           </div>
+            <div style="display:flex; justify-content:space-between; gap:10px;">
+              <span style="color:${COLORS.mc}">MC: <strong>${fmtCompact(sumMc)}</strong> <span style="opacity:0.7; font-size:9px;">(±${moeMcPct}%)</span></span>
+               <span style="color:#64748b; font-size:9px;">Conf. 95% (n=${N_SAMPLE}/edo)</span>
+            </div>
+         </div>`;
+
+      // Update Tables & Charts
+      renderScorecard(results);
+      renderStateCards(results);
+
+      // Top Chart: ONLY Simulation (17 states)
+      updateOverallChart(simWinsOficial, simWinsOpo, simWinsMc, simWinsPvem);
+
+      // Side Chart: Full Projection (32 states)
+      updateProjectedChart(totalWinsOficial, totalWinsOpo, totalWinsMc, totalWinsPvem);
+
+      updatePartyChart(results); // Passing full results to do custom stacking
+    }
+
+    // ==========================================
+    // 🎨 UI RENDERERS (Restored)
+    // ==========================================
+
+    function renderScorecard(results) {
+      const grid = document.getElementById("scorecardGrid");
+      if (!grid) return;
+      grid.innerHTML = "";
+
+      results.forEach(r => {
+        const total = r.totalVotes;
+        if (total > 0) {
+          const pOfi = ((r.vOfficial / total) * 100).toFixed(1);
+          const pOpo = ((r.vOpposition / total) * 100).toFixed(1);
+          const pMc = ((r.vMc / total) * 100).toFixed(1);
+
+          // Winner Badge
+          const badge = `<span style="background:${r.winnerColor}aa; color:#fff; padding:2px 8px; border-radius:4px; font-size:10px; font-weight:bold;">${r.winnerLabel}</span>`;
+
+          const card = document.createElement("div");
+          // Styling: Dark Card, Border, Padding
+          card.style.cssText = `
+            background: rgba(255,255,255,0.03); 
+            border: 1px solid var(--border); 
+            border-radius: 8px; 
+            padding: 10px 15px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            gap: 10px;
+          `;
+
+          // Inner HTML: Flex Layout for "State Name + Badge" (Left) and "Stats" (Right)
+          card.innerHTML = `
+            <div style="flex:1;">
+                <div style="font-weight:700; font-size:14px; color:#e2e8f0; margin-bottom:4px;">${r.name}</div>
+                <div style="display:flex; gap:8px; align-items:center;">
+                    ${badge}
+                    <span style="font-size:11px; color:var(--muted);">${fmtCompact(r.ln)} L.N.</span>
+                </div>
+            </div>
+            
+            <div style="text-align:right;">
+                <div style="font-family:monospace; font-size:12px; color:#fff; margin-bottom:4px;">${fmtCompact(r.totalVotes)} Votos</div>
+                <div style="font-size:10px;">
+                    <span style="color:${COLORS.oficial}">${pOfi}%</span> / 
+                    <span style="color:${COLORS.oposicion}">${pOpo}%</span> / 
+                    <span style="color:${COLORS.mc}">${pMc}%</span>
+                </div>
+            </div>
+          `;
+          grid.appendChild(card);
+        }
+      });
+    }
+
+    function renderStateCards(results) {
+      const container = document.getElementById("cardsContainer");
+      if (!container) return;
+      container.innerHTML = "";
+
+      results.forEach(r => {
+        const total = r.totalVotes;
+        if (total > 0) {
+          const pOfi = Math.round((r.vOfficial / total) * 100);
+          const pOpo = Math.round((r.vOpposition / total) * 100);
+          const pMc = Math.round((r.vMc / total) * 100);
+
+          let marginInfo = `+${fmtCompact(r.margin)} votos`;
+
+          const card = document.createElement("div");
+          card.className = "card";
+          card.style.padding = "10px";
+          card.style.background = `linear-gradient(180deg, ${r.winnerColor}20, rgba(255,255,255,0.02))`;
+          card.style.borderLeft = `3px solid ${r.winnerColor}`;
+          card.style.cursor = "pointer";
+          card.onclick = () => window.location.href = 'state_detail.html?id=' + r.id;
+
+          card.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                <strong style="font-size:13px;">${r.name}</strong>
+                <span style="font-size:10px; background:rgba(0,0,0,0.3); padding:2px 6px; border-radius:4px;">${marginInfo}</span>
+            </div>
+            
+            <div style="display:flex; height:6px; border-radius:3px; overflow:hidden; background:#000; margin-bottom:6px;">
+                <div style="width:${pOfi}%; background:${COLORS.oficial};" title="Oficialismo: ${pOfi}%"></div>
+                <div style="width:${pMc}%; background:${COLORS.mc};" title="MC: ${pMc}%"></div>
+                <div style="width:${pOpo}%; background:${COLORS.oposicion};" title="Oposición: ${pOpo}%"></div>
+            </div>
+            
+            <div style="display:flex; justify-content:space-between; font-size:10px; color:var(--muted);">
+                <span>Of: ${pOfi}%</span>
+                <span>Op: ${pOpo}%</span>
+            </div>
+            `;
+          container.appendChild(card);
+        }
+      });
+    }
+
+    // ==========================================
+    // 📊 CHART.JS HANDLERS
+    // ==========================================
+
+    // Global references for charts
+    let chartProjected = null;
+    let chartCurrent = null;
+
+    function updateOverallChart(ofi, opo, mc, pvem = 0) {
+      // 1. Update Main Summary Chart (Top) - 17 STATES ONLY
+      const cvs = document.getElementById('chartOverall');
+      if (cvs) {
+        const data = [ofi, opo, mc];
+        const bg = [COLORS.oficial, COLORS.oposicion, COLORS.mc];
+        const labels = ['Oficialismo', 'Oposición', 'MC (Solo)'];
+
+        if (pvem > 0) {
+          data.push(pvem);
+          bg.push(COLORS.pvem);
+          labels.push("PVEM (Verde)");
+        }
+
+        if (!chartOverall) {
+          chartOverall = new Chart(cvs, {
+            type: 'doughnut',
+            data: {
+              labels: labels,
+              datasets: [{ data: data, backgroundColor: bg, borderWidth: 0 }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: { position: 'right', labels: { color: "#adc1d4", boxWidth: 10, font: { size: 10 } } },
+                datalabels: { color: '#fff', font: { weight: 'bold' }, formatter: (val) => val > 0 ? val : '' }
+              }
+            }
+          });
+        } else {
+          chartOverall.data.labels = labels;
+          chartOverall.data.datasets[0].data = data;
+          chartOverall.data.datasets[0].backgroundColor = bg;
+          chartOverall.update();
+        }
+      }
+    }
+
+    function updateProjectedChart(ofi, opo, mc, pvem = 0) {
+      // 2. Update Projection Chart (Side) - 32 STATES (Full Country)
+      const cvsProj = document.getElementById('chartProjectedGov');
+      if (cvsProj) {
+        const data = [ofi, opo, mc];
+        const bg = [COLORS.oficial, COLORS.oposicion, COLORS.mc];
+        const labels = ['Oficialismo', 'Oposición', 'MC'];
+
+        if (pvem > 0) {
+          data.push(pvem);
+          bg.push(COLORS.pvem);
+          labels.push("PVEM");
+        }
+
+        if (!chartProjected) {
+          chartProjected = new Chart(cvsProj, {
+            type: 'doughnut',
+            data: {
+              labels: labels,
+              datasets: [{ data: data, backgroundColor: bg, borderWidth: 0 }]
+            },
+            options: {
+              cutout: '60%',
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: {
+                  display: true,
+                  position: 'bottom',
+                  labels: { color: "#adc1d4", boxWidth: 8, font: { size: 9 }, padding: 8 }
+                },
+                datalabels: { color: '#fff', font: { weight: 'bold', size: 10 }, formatter: (val) => val > 0 ? val : '' }
+              }
+            }
+          });
+        } else {
+          chartProjected.data.labels = labels;
+          chartProjected.data.datasets[0].data = data;
+          chartProjected.data.datasets[0].backgroundColor = bg;
+          chartProjected.update();
+        }
+      }
+    }
+
+    // 3. Initialize Static Current Gov Chart
+    function initCurrentGovChart() {
+      const cvs = document.getElementById('chartCurrentGov');
+      if (!cvs) return;
+
+      // Calculate totals based on ALL_STATES 'curr' prop + NON_ELECTION_STATES
+      // Calculate totals based on ALL_STATES 'curr' prop + NON_ELECTION_STATES
+      let countOfi = 0; // morena
+      let countPan = 0; // pan (labeled as Oposición/Azul usually)
+      let countPri = 0; // pri (Red)
+      let countMc = 0;  // mc
+      let countPvem = 0; // pvem
+
+      const fullList = [...ALL_STATES, ...NON_ELECTION_STATES];
+
+      fullList.forEach(s => {
+        const c = s.curr || 'morena'; // fallback
+        if (c === 'morena') countOfi++;
+        else if (c === 'pan' || c === 'prd') countPan++; // Group PAN/PRD as Blue Bloc
+        else if (c === 'pri') countPri++; // Explicit PRI
+        else if (c === 'mc') countMc++;
+        else if (c === 'pvem') countPvem++;
+      });
+
+      // Mapping to standard colors
+      const data = [countOfi, countPan, countMc];
+      const bg = [COLORS.oficial, COLORS.oposicion, COLORS.mc];
+      const labels = ['Oficialismo', 'PAN / Opo', 'MC'];
+
+      if (countPri > 0) {
+        data.push(countPri);
+        bg.push(COLORS.pri);
+        labels.push('PRI');
+      }
+
+      if (countPvem > 0) {
+        data.push(countPvem);
+        bg.push(COLORS.pvem);
+        labels.push('PVEM');
+      }
+
+      chartCurrent = new Chart(cvs, {
+        type: 'doughnut',
+        data: {
+          labels: labels,
+          datasets: [{ data: data, backgroundColor: bg, borderWidth: 0 }]
+        },
+        options: {
+          cutout: '60%',
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: true,
+              position: 'bottom',
+              labels: { color: "#adc1d4", boxWidth: 8, font: { size: 9 }, padding: 8 }
+            },
+            datalabels: { color: '#fff', font: { weight: 'bold', size: 10 }, formatter: (val) => val > 0 ? val : '' }
+          }
+        }
+      });
+    }
+
+    // Call init on load
+    setTimeout(initCurrentGovChart, 500);
+
+    function updatePartyChart(results) {
+      // Aggregating by BLOC as requested
+      // "When 4T is selected, sum to Morena" -> distinct 4T Bloc
+      // "When Opposition is selected, sum to Alliance" -> distinct Opos Bloc
+
+      let totalOficial = 0;
+      let totalOposicion = 0;
+      let totalMc = 0;
+      let totalOtros = 0;
+
+      results.forEach(r => {
+        totalOficial += r.vOfficial || 0;
+        totalOposicion += r.vOpposition || 0;
+        totalMc += r.vMc || 0;
+
+        // Sum "Otros" from raw breakdown to ensure they aren't lost, 
+        // plus any solo small parties if they exist in rawBreakdown but not in principal blocs
+        if (r.rawBreakdown) {
+          totalOtros += (r.rawBreakdown.otros || 0);
+          // Optionally add other solo parties if needed, but 'otros' covers the main independent bucket
+        }
+      });
+
+      // Labels and Data
+      const labels = ["Oficialismo (4T)", "Oposición (PAN/PRI)", "Mov. Ciudadano", "Otros"];
+      const data = [totalOficial, totalOposicion, totalMc, totalOtros];
+
+      const bg = [
+        COLORS.oficial,   // Morena Cherry
+        COLORS.oposicion, // Blue
+        COLORS.mc,        // Orange
+        COLORS.neutral    // Grey
+      ];
+
+      const cvs = document.getElementById('chartParties');
+      if (!cvs) return;
+
+      if (!chartParties) {
+        chartParties = new Chart(cvs, {
+          type: 'bar',
+          data: {
+            labels: labels,
+            datasets: [{
+              label: 'Votos Totales (Simulados)',
+              data: data,
+              backgroundColor: bg,
+              borderRadius: 4
+            }]
+          },
+          options: {
+            layout: { padding: { right: 60 } },
+            responsive: true,
+            maintainAspectRatio: false,
+            indexAxis: 'y',
+            plugins: {
+              legend: { display: false },
+              datalabels: {
+                color: '#fff',
+                anchor: 'end',
+                align: 'end',
+                formatter: (val) => fmtCompact(val)
+              }
+            },
+            scales: {
+              x: { display: false, grid: { display: false } },
+              y: { grid: { display: false, drawBorder: false }, ticks: { color: '#9fb0da', font: { size: 11 } } }
+            }
+          }
+        });
+      } else {
+        chartParties.data.datasets[0].data = data;
+        chartParties.update();
+      }
+    }
+
+    // ==========================================
+    // 📸 HISTORY & UTILS
+    // ==========================================
+
+    function captureSnapshot() {
+      console.log("Snapshot captured");
+    }
+
+    function toggleStateModal() {
+      const el = document.getElementById("modalStates");
+      if (el) {
+        el.style.display = (el.style.display === "none") ? "flex" : "none";
+        // If closing, update sim
+        if (el.style.display === "none") updateSim();
+      }
+    }
+
+    // Init Checkboxes
+    const stateListContainer = document.getElementById("stateListContainer");
+    if (stateListContainer && ALL_STATES) {
+      stateListContainer.innerHTML = ""; // Clear first
+      ALL_STATES.forEach(s => {
+        const div = document.createElement("div");
+        div.innerHTML = `<label style="display:flex; gap:8px; padding:6px; cursor:pointer;">
+             <input type="checkbox" value="${s.id}" checked onchange="updateActiveStates(this)">
+             ${s.name}
+          </label>`;
+        stateListContainer.appendChild(div);
+      });
+    }
+
+    function updateActiveStates(chk) {
+      if (chk.checked) {
+        if (!activeStateIds.includes(chk.value)) activeStateIds.push(chk.value);
+      } else {
+        activeStateIds = activeStateIds.filter(id => id !== chk.value);
+      }
+    }
+
+    // Capture renderHistoryTable placeholder if it was called
+    function renderHistoryTable() { }
+
+    // Initial Run
+    window.onload = () => {
+      updateSim();
+    };
+
+  </script>
+</body>
+
+</html>
+
+
+</body>
+
+</html>

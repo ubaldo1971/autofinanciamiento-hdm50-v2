@@ -1,0 +1,2691 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Sonora 2027 – Detalle de Candidatos</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script
+        src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg: #0b1020;
+            --card-bg: #111a33;
+            --text: #e9eefc;
+            --muted: #9fb0da;
+            --border: rgba(255, 255, 255, .09);
+            --morena: #6a1b31;
+            --pan: #1565c0;
+            --pri: #e53935;
+            --mc: #ff9800;
+            --indep: #7c4dff;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background: radial-gradient(circle at 50% 0%, #1e2846 0%, var(--bg) 70%);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        .wrap {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 20px 40px;
+        }
+
+        /* HEADER */
+        header {
+            padding: 24px 0;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .breadcrumb {
+            font-size: 13px;
+            color: var(--muted);
+            margin-bottom: 8px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .breadcrumb:hover {
+            color: #fff;
+            text-decoration: underline;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 28px;
+            letter-spacing: -0.5px;
+        }
+
+        /* STATS GRID */
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 30px;
+        }
+
+        @media(max-width:600px) {
+            .grid-3 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-val {
+            font-size: 20px;
+            font-weight: 700;
+            margin-top: 4px;
+            color: #fff;
+        }
+
+        /* CANDIDATES */
+        .candidates-section {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 30px;
+        }
+
+        .cand-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .candidate-card {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            transition: transform 0.2s;
+        }
+
+        .candidate-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #333;
+            overflow: hidden;
+            flex-shrink: 0;
+            border: 2px solid var(--border);
+        }
+
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .cand-info h3 {
+            margin: 0 0 4px;
+            font-size: 16px;
+        }
+
+        .cand-role {
+            font-size: 12px;
+            color: var(--muted);
+            margin-bottom: 6px;
+        }
+
+        .cand-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        /* CHARTS & NOTES */
+        .analysis-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+        }
+
+        @media(max-width:768px) {
+            .analysis-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .chart-box {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+            height: 320px;
+            position: relative;
+        }
+
+        .notes-box {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+        }
+
+        .notes-box h4 {
+            margin: 0 0 12px;
+            font-size: 14px;
+            color: var(--muted);
+        }
+
+        .note-item {
+            font-size: 13px;
+            margin-bottom: 12px;
+            line-height: 1.5;
+            border-left: 2px solid var(--border);
+            padding-left: 10px;
+        }
+
+        /* COLORS */
+        .bg-morena {
+            background: rgba(183, 28, 28, 0.2);
+            color: #ef9a9a;
+            border: 1px solid var(--morena);
+        }
+
+        .bg-pan {
+            background: rgba(21, 101, 192, 0.2);
+            color: #90caf9;
+            border: 1px solid var(--pan);
+        }
+
+        .bg-mc {
+            background: rgba(255, 152, 0, 0.2);
+            color: #ffcc80;
+            border: 1px solid var(--mc);
+        }
+
+        /* MUNI CONTROL */
+        .mc-control-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            padding: 10px 20px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+        }
+
+        .mc-control-arrow {
+            cursor: pointer;
+            font-size: 24px;
+            color: var(--muted);
+            transition: 0.3s;
+            user-select: none;
+            padding: 0 10px;
+        }
+
+        .mc-control-arrow:hover {
+            color: #fff;
+            transform: scale(1.2);
+        }
+
+        .mc-control-arrow.active-left {
+            color: #ef5350;
+            text-shadow: 0 0 10px #ef5350;
+            transform: scale(1.2);
+        }
+
+        .mc-control-arrow.active-right {
+            color: #42a5f5;
+            text-shadow: 0 0 10px #42a5f5;
+            transform: scale(1.2);
+        }
+
+        @keyframes blink-magenta {
+            0% {
+                opacity: 1;
+                text-shadow: 0 0 10px #ff00ff;
+            }
+
+            50% {
+                opacity: 0.4;
+                text-shadow: none;
+            }
+
+            100% {
+                opacity: 1;
+                text-shadow: 0 0 10px #ff00ff;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="wrap">
+        <header>
+            <div>
+                <a href="index.html" class="breadcrumb">← Volver al Panel Nacional</a>
+                <h1><span id="stateNameTitle">Detalle Estatal</span> <span
+                        style="font-weight:400; color:var(--muted); font-size:0.7em;">Elección 2027</span>
+                </h1>
+                <!-- Sim Toggle -->
+                <div style="margin-top:5px;">
+                    <label
+                        style="display:inline-flex; align-items:center; cursor:pointer; font-size:13px; color:#ffcc80; background:rgba(255,152,0,0.1); padding:4px 10px; border-radius:15px; border:1px solid rgba(255,152,0,0.3);">
+                        <input type="checkbox" id="toggleSimSection" onchange="toggleSimulatorVisibility()"
+                            style="margin-right:8px; accent-color:#ff9800;">
+                        Mostrar Simulador
+                    </label>
+                </div>
+            </div>
+            <div style="text-align:right">
+                <div style="font-size:12px; color:var(--muted)">Gobernador Actual</div>
+                <div style="font-weight:600">Alfonso Durazo (Morena)</div>
+            </div>
+        </header>
+
+        <!-- KEY STATS -->
+        <div class="grid-3">
+            <div class="stat-card">
+                <div class="stat-label">Lista Nominal</div>
+                <div class="stat-val">2.4 Millones</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Preferencia Líder</div>
+                <div class="stat-val" style="color:#ef9a9a">Morena (44%)</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Competitividad</div>
+                <div class="stat-val" style="color:#fbbf24">Media-Alta</div>
+            </div>
+        </div>
+
+        <!-- MIGRANT VOTER SIMULATION (SONORA ONLY) -->
+        <div id="migrantSection" class="candidates-section"
+            style="margin-bottom:30px; background: linear-gradient(135deg, rgba(156,39,176,0.1) 0%, rgba(103,58,183,0.15) 100%); border: 1px solid rgba(156,39,176,0.3); display:none;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                <div>
+                    <h2 style="margin:0; font-size:18px; color:#CE93D8;">🌎 Simulador: Voto Migrante</h2>
+                    <p style="margin:4px 0 0; font-size:12px; color:var(--muted);">Cargando datos de población...</p>
+                </div>
+                <div
+                    style="background:rgba(156,39,176,0.2); padding:8px 14px; border-radius:8px; border:1px solid rgba(156,39,176,0.4);">
+                    <div style="font-size:10px; color:#CE93D8; text-transform:uppercase;">Votos Migrantes Activos</div>
+                    <div id="migrantVotesDisplay" style="font-size:20px; font-weight:700; color:#E1BEE7;">0</div>
+                </div>
+            </div>
+
+            <!-- SLIDER -->
+            <div style="background:rgba(0,0,0,0.2); border-radius:10px; padding:16px; margin-bottom:16px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                    <span style="font-size:13px; color:#E1BEE7;">¿Cuántos migrantes votarían?</span>
+                    <span id="sliderValue" style="font-size:14px; font-weight:700; color:#CE93D8;">0 votos</span>
+                </div>
+                <input type="range" id="migrantSlider" min="0" max="802000" value="0" step="1000"
+                    style="width:100%; height:8px; -webkit-appearance:none; background:linear-gradient(90deg, #7B1FA2 0%, #E1BEE7 100%); border-radius:4px; cursor:pointer;">
+                <div
+                    style="display:flex; justify-content:space-between; font-size:10px; color:var(--muted); margin-top:5px;">
+                    <span>0</span>
+                    <span>200k</span>
+                    <span>400k</span>
+                    <span>600k</span>
+                    <span>802k</span>
+                </div>
+            </div>
+
+            <!-- PARTY ALLOCATION -->
+            <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:10px; margin-bottom:16px;">
+                <button id="btnOficialismo" onclick="setMigrantParty('oficialismo')"
+                    style="padding:10px 8px; border-radius:8px; border:2px solid #6a1b31; background:rgba(106,27,49,0.1); color:#ef9a9a; font-weight:600; cursor:pointer; transition:all 0.2s; font-size:12px;">
+                    🔴 Morena
+                </button>
+                <button id="btnOposicion" onclick="setMigrantParty('oposicion')"
+                    style="padding:10px 8px; border-radius:8px; border:2px solid #1565c0; background:rgba(21,101,192,0.1); color:#90caf9; font-weight:600; cursor:pointer; transition:all 0.2s; font-size:12px;">
+                    🔵 PAN+
+                </button>
+                <button id="btnMC" onclick="setMigrantParty('mc')"
+                    style="padding:10px 8px; border-radius:8px; border:2px solid #ff9800; background:rgba(255,152,0,0.1); color:#ffcc80; font-weight:600; cursor:pointer; transition:all 0.2s; font-size:12px;">
+                    🟠 MC
+                </button>
+                <button id="btnDividido" onclick="setMigrantParty('dividido')"
+                    style="padding:10px 8px; border-radius:8px; border:2px solid #9C27B0; background:rgba(156,39,176,0.1); color:#CE93D8; font-weight:600; cursor:pointer; transition:all 0.2s; font-size:12px;">
+                    🟣 Dividido
+                </button>
+            </div>
+
+            <!-- MC COALITION SELECTOR -->
+            <div
+                style="background:rgba(255,152,0,0.1); border:1px solid rgba(255,152,0,0.3); border-radius:10px; padding:14px; margin-bottom:16px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                    <div>
+                        <span style="font-size:14px; font-weight:600; color:#ffcc80;">🟠 ¿MC se suma a una
+                            coalición?</span>
+                        <p style="margin:4px 0 0; font-size:11px; color:var(--muted);">Simula alianzas electorales con
+                            Movimiento Ciudadano (12%)</p>
+                    </div>
+                </div>
+                <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:10px;">
+                    <button id="btnMCIndep" onclick="setMCCoalition('independiente')"
+                        style="padding:10px 8px; border-radius:6px; border:2px solid #ff9800; background:rgba(255,152,0,0.2); color:#ffcc80; font-weight:600; cursor:pointer; transition:all 0.2s; font-size:11px;">
+                        🟠 MC Independiente
+                    </button>
+                    <button id="btnMCMorena" onclick="setMCCoalition('oficialismo')"
+                        style="padding:10px 8px; border-radius:6px; border:1px solid rgba(106,27,49,0.5); background:rgba(106,27,49,0.1); color:#ef9a9a; font-weight:600; cursor:pointer; transition:all 0.2s; font-size:11px;">
+                        🔴 MC → Morena
+                    </button>
+                    <button id="btnMCPAN" onclick="setMCCoalition('oposicion')"
+                        style="padding:10px 8px; border-radius:6px; border:1px solid rgba(21,101,192,0.5); background:rgba(21,101,192,0.1); color:#90caf9; font-weight:600; cursor:pointer; transition:all 0.2s; font-size:11px;">
+                        🔵 MC → PAN+
+                    </button>
+                </div>
+                <!-- MC COALITION IMPACT PREVIEW -->
+                <div id="mcCoalitionImpact"
+                    style="display:none; margin-top:12px; padding:10px; background:rgba(0,0,0,0.2); border-radius:6px;">
+                    <span style="font-size:11px; color:#ffcc80;">📊 Impacto: </span>
+                    <span id="mcImpactText" style="font-size:12px; font-weight:600; color:#fff;"></span>
+                </div>
+            </div>
+
+            <!-- IMPACT VISUALIZATION -->
+            <div style="background:rgba(0,0,0,0.25); border-radius:10px; padding:16px;">
+                <h4 style="margin:0 0 12px; font-size:14px; color:#CE93D8;">📊 Impacto en Intención de Voto Estatal</h4>
+                <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:20px;">
+                    <!-- BEFORE -->
+                    <div>
+                        <div style="font-size:11px; color:var(--muted); text-transform:uppercase; margin-bottom:8px;">
+                            Sin Voto Migrante</div>
+                        <div style="display:flex; gap:10px; align-items:center;">
+                            <div style="flex:1;">
+                                <div
+                                    style="display:flex; justify-content:space-between; font-size:11px; margin-bottom:3px;">
+                                    <span style="color:#ef9a9a;">Morena</span>
+                                    <span id="baseMorena" style="color:#fff;">--%</span>
+                                </div>
+                                <div
+                                    style="height:8px; background:rgba(255,255,255,0.1); border-radius:4px; overflow:hidden;">
+                                    <div id="barBaseMorena"
+                                        style="height:100%; background:#6a1b31; width:0%; transition:width 0.3s;">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="display:flex; gap:10px; align-items:center; margin-top:8px;">
+                            <div style="flex:1;">
+                                <div
+                                    style="display:flex; justify-content:space-between; font-size:11px; margin-bottom:3px;">
+                                    <span style="color:#90caf9;">PAN+</span>
+                                    <span id="basePAN" style="color:#fff;">--%</span>
+                                </div>
+                                <div
+                                    style="height:8px; background:rgba(255,255,255,0.1); border-radius:4px; overflow:hidden;">
+                                    <div id="barBasePAN"
+                                        style="height:100%; background:#1565c0; width:0%; transition:width 0.3s;">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- MC ROW -->
+                        <div style="display:flex; gap:10px; align-items:center; margin-top:8px;">
+                            <div style="flex:1;">
+                                <div
+                                    style="display:flex; justify-content:space-between; font-size:11px; margin-bottom:3px;">
+                                    <span style="color:#ffcc80;">MC</span>
+                                    <span id="baseMC" style="color:#fff;">--%</span>
+                                </div>
+                                <div
+                                    style="height:8px; background:rgba(255,255,255,0.1); border-radius:4px; overflow:hidden;">
+                                    <div id="barBaseMC"
+                                        style="height:100%; background:#ff9800; width:0%; transition:width 0.3s;">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- AFTER -->
+                    <div>
+                        <div style="font-size:11px; color:#CE93D8; text-transform:uppercase; margin-bottom:8px;">Con
+                            Voto Migrante 🌎</div>
+                        <div style="display:flex; gap:10px; align-items:center;">
+                            <div style="flex:1;">
+                                <div
+                                    style="display:flex; justify-content:space-between; font-size:11px; margin-bottom:3px;">
+                                    <span style="color:#ef9a9a;">Morena</span>
+                                    <span id="newMorena" style="color:#fff;">--%</span>
+                                </div>
+                                <div
+                                    style="height:8px; background:rgba(255,255,255,0.1); border-radius:4px; overflow:hidden;">
+                                    <div id="barNewMorena"
+                                        style="height:100%; background:#6a1b31; width:0%; transition:width 0.3s;">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="display:flex; gap:10px; align-items:center; margin-top:8px;">
+                            <div style="flex:1;">
+                                <div
+                                    style="display:flex; justify-content:space-between; font-size:11px; margin-bottom:3px;">
+                                    <span style="color:#90caf9;">PAN+</span>
+                                    <span id="newPAN" style="color:#fff;">--%</span>
+                                </div>
+                                <div
+                                    style="height:8px; background:rgba(255,255,255,0.1); border-radius:4px; overflow:hidden;">
+                                    <div id="barNewPAN"
+                                        style="height:100%; background:#1565c0; width:0%; transition:width 0.3s;">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- MC ROW -->
+                        <div style="display:flex; gap:10px; align-items:center; margin-top:8px;">
+                            <div style="flex:1;">
+                                <div
+                                    style="display:flex; justify-content:space-between; font-size:11px; margin-bottom:3px;">
+                                    <span style="color:#ffcc80;">MC</span>
+                                    <span id="newMC" style="color:#fff;">--%</span>
+                                </div>
+                                <div
+                                    style="height:8px; background:rgba(255,255,255,0.1); border-radius:4px; overflow:hidden;">
+                                    <div id="barNewMC"
+                                        style="height:100%; background:#ff9800; width:0%; transition:width 0.3s;">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- DIFFERENCE INDICATOR -->
+                <div id="diffIndicator"
+                    style="margin-top:15px; padding:10px; background:rgba(156,39,176,0.15); border-radius:8px; text-align:center; display:none;">
+                    <span style="font-size:12px; color:#E1BEE7;">Cambio en diferencia: </span>
+                    <span id="diffValue" style="font-size:16px; font-weight:700; color:#CE93D8;">+0%</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ASPIRANTES -->
+        <div class="candidates-section">
+            <h2 style="margin:0; font-size:18px;">Aspirantes Destacados</h2>
+            <div class="cand-grid">
+
+                <!-- Cand 1 -->
+                <div class="candidate-card">
+                    <div class="avatar" style="background:#6a1b31;">
+                        <!-- Placeholder for Lorenia Valles -->
+                        <div
+                            style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:bold;">
+                            LV</div>
+                    </div>
+                    <div class="cand-info">
+                        <h3>Lorenia Valles</h3>
+                        <div class="cand-role">Senadora de la República</div>
+                        <span class="cand-badge bg-morena">Morena</span>
+                    </div>
+                </div>
+
+                <!-- Cand 2 -->
+                <div class="candidate-card">
+                    <div class="avatar" style="background:#1565c0;">
+                        <div
+                            style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:bold;">
+                            TA</div>
+                    </div>
+                    <div class="cand-info">
+                        <h3>Toño Astiazarán</h3>
+                        <div class="cand-role">Alcalde de Hermosillo</div>
+                        <span class="cand-badge bg-pan">PAN / Alianza</span>
+                    </div>
+                </div>
+
+                <!-- Cand 3 -->
+                <div class="candidate-card">
+                    <div class="avatar" style="background:#6a1b31;">
+                        <div
+                            style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:bold;">
+                            JL</div>
+                    </div>
+                    <div class="cand-info">
+                        <h3>Javier Lamarque</h3>
+                        <div class="cand-role">Alcalde de Cajeme</div>
+                        <span class="cand-badge bg-morena">Morena</span>
+                    </div>
+                </div>
+
+                <!-- Cand 4 -->
+                <div class="candidate-card">
+                    <div class="avatar" style="background:#ff9800;">
+                        <div
+                            style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:bold;">
+                            PM</div>
+                    </div>
+                    <div class="cand-info">
+                        <h3>Patricia Mercado</h3>
+                        <div class="cand-role">Diputada / Senadora</div>
+                        <span class="cand-badge bg-mc">Movimiento C.</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ANALYSIS GRID (Careo + Sidebar) -->
+        <div class="analysis-grid">
+
+            <!-- MAIN CHART (CAREO) -->
+            <div class="chart-box" style="display:flex; flex-direction:column;">
+                <!-- RELIABILITY BADGE (Absolute Top Right) -->
+                <div id="reliabilityBadge"
+                    style="position:absolute; top:20px; right:20px; font-size:13px; color:#ff00ff; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; animation: blink-magenta 2s infinite;">
+                    MARGEN DE CONFIABILIDAD: --%
+                </div>
+
+                <div
+                    style="display:flex; justify-content:flex-start; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:15px; padding-right:200px;">
+                    <h3 style="margin:0; font-size:16px;">Intención de Voto (Careo Directo)</h3>
+                    <div style="display:flex; gap:10px; align-items:center;">
+                        <!-- MIGRANT TOGGLE -->
+                        <div id="migrantToggleContainer"
+                            style="display:none; align-items:center; gap:6px; background:rgba(156,39,176,0.15); padding:4px 10px; border-radius:6px; border:1px solid rgba(156,39,176,0.3);">
+                            <span style="font-size:10px; color:#CE93D8;">🌎 Migrantes</span>
+                            <label class="toggle-switch"
+                                style="position:relative; display:inline-block; width:36px; height:20px;">
+                                <input type="checkbox" id="migrantToggle" onchange="toggleMigrantEffect()"
+                                    style="opacity:0; width:0; height:0;">
+                                <span
+                                    style="position:absolute; cursor:pointer; top:0; left:0; right:0; bottom:0; background-color:#444; transition:.3s; border-radius:20px;"></span>
+                                <span id="toggleKnob"
+                                    style="position:absolute; content:''; height:14px; width:14px; left:3px; bottom:3px; background-color:#fff; transition:.3s; border-radius:50%;"></span>
+                            </label>
+                        </div>
+                        <!-- SCENARIO TOGGLE -->
+                        <select id="selScenario" onchange="updateCareo()"
+                            style="background:rgba(255,255,255,0.1); border:1px solid var(--border); color:#fff; padding:4px 8px; border-radius:6px; font-size:11px;">
+                            <option value="lorenia">Escenario A: Lorenia Valles</option>
+                            <option value="lamarque">Escenario B: Javier Lamarque</option>
+                        </select>
+                    </div>
+
+                    <!-- MC STRATEGY TOGGLE (Global for State) -->
+                    <div
+                        style="width:100%; display:flex; justify-content:center; margin-top:10px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.05);">
+                        <div
+                            style="display:flex; align-items:center; gap:12px; background:rgba(0,0,0,0.3); padding:6px 14px; border-radius:30px; border:1px solid var(--border);">
+                            <span onclick="setMcCoalition('oficialismo')"
+                                style="font-size:10px; font-weight:700; color:#e57373; cursor:pointer; opacity:0.6; transition:all 0.2s;"
+                                id="mc_opt_oficial">OFICIALISMO</span>
+                            <div style="display:flex; align-items:center; gap:5px;">
+                                <span style="color:#64748b; font-size:10px;">←</span>
+                                <div onclick="setMcCoalition('independiente')" id="mc_knob"
+                                    style="width:28px; height:28px; background:#ff9800; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:9px; color:#fff; cursor:pointer; box-shadow:0 0 10px rgba(255,152,0,0.4); text-align:center; line-height:1;">
+                                    MC<br><span style="font-size:6px; opacity:0.8;">SOLO</span></div>
+                                <span style="color:#64748b; font-size:10px;">→</span>
+                            </div>
+                            <span onclick="setMcCoalition('oposicion')"
+                                style="font-size:10px; font-weight:700; color:#64b5f6; cursor:pointer; opacity:0.6; transition:all 0.2s;"
+                                id="mc_opt_oposicion">OPOSICIÓN</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- MIGRANT EFFECT INDICATOR -->
+                <div id="migrantEffectBadge"
+                    style="display:none; background:linear-gradient(90deg, rgba(156,39,176,0.2), rgba(103,58,183,0.2)); padding:6px 12px; border-radius:6px; margin-bottom:8px; border:1px solid rgba(156,39,176,0.3);">
+                    <span style="font-size:11px; color:#E1BEE7;">🌎 <span id="migrantEffectText">Incluye 0 votos
+                            migrantes</span></span>
+                </div>
+                <div style="flex:1; position:relative;">
+                    <canvas id="chartCareo"></canvas>
+                </div>
+            </div>
+
+            <!-- INTERNA / NOTES (Right Column) -->
+            <div style="display:flex; flex-direction:column; gap:20px;">
+
+                <!-- INTERNA CHART -->
+                <div class="notes-box">
+                    <h4 style="margin-bottom:10px; color:#fff;">Interna Morena (Preferencia)</h4>
+                    <div style="height:140px; position:relative;">
+                        <canvas id="chartInterna"></canvas>
+                    </div>
+                </div>
+
+                <div class="notes-box" style="flex:1;">
+                    <h4>Notas de Inteligencia</h4>
+                    <div class="note-item">
+                        <strong>Lorenia vs Lamarque:</strong>
+                        Lorenia Valles lidera la interna con +12% sobre Lamarque, capitalizando su presencia estatal
+                        como Senadora.
+                    </div>
+                    <div class="note-item">
+                        <strong>Impacto Astiazarán:</strong>
+                        Toño Astiazarán sube +4 puntos en el escenario contra Lamarque, aprovechando el desgaste
+                        municipal en Cajeme.
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- MUNICIPALITIES DROPDOWN SECTION -->
+        <div class="notes-box" style="margin-top:20px; transition:all 0.3s ease;">
+            <div onclick="toggleMuniSection()"
+                style="display:flex; justify-content:space-between; align-items:center; cursor:pointer; user-select:none;">
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <h4 style="margin:0; color:#fff;">Intención de Voto por Municipio</h4>
+                    <span
+                        style="font-size:11px; background:rgba(255,255,255,0.1); padding:2px 8px; border-radius:10px; color:var(--muted)">Desplegar</span>
+                </div>
+                <div id="muniToggleIcon" style="font-size:18px; color:var(--muted); transition:transform 0.3s;">▼</div>
+            </div>
+
+            <div id="muniSectionContent"
+                style="display:none; margin-top:20px; border-top:1px solid var(--border); padding-top:20px;">
+                <div style="font-size:11px; color:var(--muted); margin-bottom:15px;">6 Municipios Más Poblados</div>
+
+                <!-- MC STRATEGY CONTROL -->
+                <div class="mc-control-bar"
+                    style="background:transparent; border:none; padding:10px 0; justify-content:center; gap:20px;">
+                    <div style="color:#ef5350; font-weight:bold; font-size:13px; letter-spacing:1px; cursor:pointer;"
+                        onclick="setMuniCoalition('oficialismo')">OFICIALISMO</div>
+
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <div id="muniArrowLeft" class="mc-control-arrow" style="font-size:28px; color:#fff;"
+                            onclick="setMuniCoalition('oficialismo')">←</div>
+
+                        <div style="display:flex; flex-direction:column; align-items:center; cursor:pointer;"
+                            onclick="setMuniCoalition('indep')">
+                            <div class="avatar"
+                                style="width:40px; height:40px; background:#ff9800; border:none; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 15px rgba(255,152,0,0.4);">
+                                <div style="color:#fff; font-weight:bold; font-size:12px;">MC</div>
+                            </div>
+                            <div id="muniMcStatus"
+                                style="font-size:9px; font-weight:bold; color:#ffcc80; margin-top:4px;">SOLO</div>
+                        </div>
+
+                        <div id="muniArrowRight" class="mc-control-arrow" style="font-size:28px; color:#fff;"
+                            onclick="setMuniCoalition('oposicion')">→</div>
+                    </div>
+
+                    <div style="color:#42a5f5; font-weight:bold; font-size:13px; letter-spacing:1px; cursor:pointer;"
+                        onclick="setMuniCoalition('oposicion')">OPOSICIÓN</div>
+                </div>
+
+                <div id="muniGrid"
+                    style="display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:20px;">
+                    <!-- JS Injected -->
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function toggleMuniSection() {
+            const content = document.getElementById('muniSectionContent');
+            const icon = document.getElementById('muniToggleIcon');
+            if (content.style.display === 'none') {
+                content.style.display = 'block';
+                icon.style.transform = 'rotate(180deg)';
+            } else {
+                content.style.display = 'none';
+                icon.style.transform = 'rotate(0deg)';
+            }
+        }
+    </script>
+
+    <div
+        style="border-top:1px solid rgba(255,255,255,0.1); margin-top:40px; padding-top:20px; color:var(--muted); font-size:11px; text-align:center; padding-bottom:20px;">
+        <div style="margin-bottom:5px; font-weight:bold; letter-spacing:1px;">METODOLOGÍA DE DATOS</div>
+        Fuente: Consolidado de Encuestas Estatales (Promedio Ponderado) • Datos INE Lista Nominal • Proyección de Voto
+        en el Extranjero.
+        <br>
+        <span style="opacity:0.6;">Corte Informativo: Enero 2026 | simulador.elecciones.mx</span>
+    </div>
+
+    <script>
+        // INIT CHART CONFIG
+        Chart.register(ChartDataLabels);
+        Chart.defaults.font.family = 'Inter';
+        Chart.defaults.color = '#9fb0da';
+
+        // ==========================================
+        // DATA STORE FOR ALL ACTIVE STATES
+        // ==========================================
+        const DATA_STATES = {
+            "sonora": {
+                name: "Sonora",
+                gov: "Alfonso Durazo (Morena)",
+                ln: "2.4 Millones",
+                prefLeader: "Morena (44%)",
+                comp: "Media-Alta",
+                aspirantes: [
+                    { name: "Lorenia Valles", role: "Senadora", party: "Morena", color: "#6a1b31", initials: "LV" },
+                    { name: "Toño Astiazarán", role: "Alcalde Hermosillo", party: "PAN / Alianza", color: "#1565c0", initials: "TA" },
+                    { name: "Javier Lamarque", role: "Alcalde Cajeme", party: "Morena", color: "#6a1b31", initials: "JL" },
+                    { name: "Patricia Mercado", role: "Senadora", party: "Movimiento C.", color: "#ff9800", initials: "PM" }
+                ],
+                scenarios: {
+                    a: { label: "Escenario A: Lorenia Valles", labels: ['Lorenia Valles (40%)', 'Toño Astiazarán (28%)', 'P. Mercado (12%)', 'Indecisos (20%)'], data: [40, 28, 12, 20], colors: ['#6a1b31', '#1565c0', '#ff9800', '#64748b'] },
+                    b: { label: "Escenario B: Javier Lamarque", labels: ['Javier Lamarque (36%)', 'Toño Astiazarán (32%)', 'P. Mercado (12%)', 'Indecisos (20%)'], data: [36, 32, 12, 20], colors: ['#6a1b31', '#1565c0', '#ff9800', '#64748b'] }
+                },
+                interna: { title: "Interna Morena", labels: ["Lorenia Valles", "Javier Lamarque", "Heriberto Aguilar", "Otros"], data: [36, 24, 14, 26], colors: ['#6a1b31', '#ef5350', '#7f0000', '#64748b'] },
+                notes: [
+                    { title: "Posición Morena", text: "Ventaja sólida impulsada por marca federal, pero con desgaste local en seguridad." },
+                    { title: "Factor Hermosillo", text: "Toño Astiazarán es el único opositor con tracción estatal real." }
+                ],
+                municipios: [
+                    { name: "Hermosillo", party: "PAN / Alianza", candidate: "Toño Astiazarán (Reelección/Grupo)", lead: "+5% vs Morena", color: "#1565c0" },
+                    { name: "Cajeme", party: "Morena", candidate: "Grupo Lamarque", lead: "+18% Sólida", color: "#6a1b31" },
+                    { name: "Nogales", party: "Morena", candidate: "Ramón Baldenebro", lead: "+12%", color: "#6a1b31" }
+                ],
+                // 6 MUNICIPIOS MÁS GRANDES - INTENCIÓN DE VOTO DETALLADA
+                municipiosDetallados: [
+                    {
+                        name: "Hermosillo",
+                        poblacion: "800,000 hab",
+                        intencionVoto: {
+                            labels: ['Morena (33%)', 'PAN/Alianza (38%)', 'MC (12%)', 'Otros/Indec. (17%)'],
+                            data: [33, 38, 12, 17],
+                            colors: ['#6a1b31', '#1565c0', '#ff9800', '#64748b']
+                        },
+                        lider: "PAN/Alianza",
+                        ventaja: "+5%",
+                        color: "#1565c0"
+                    },
+                    {
+                        name: "Cajeme (Cd. Obregón)",
+                        poblacion: "430,000 hab",
+                        intencionVoto: {
+                            labels: ['Morena (52%)', 'PAN/Alianza (28%)', 'MC (8%)', 'Otros/Indec. (12%)'],
+                            data: [52, 28, 8, 12],
+                            colors: ['#6a1b31', '#1565c0', '#ff9800', '#64748b']
+                        },
+                        lider: "Morena",
+                        ventaja: "+24%",
+                        color: "#6a1b31"
+                    },
+                    {
+                        name: "Nogales",
+                        poblacion: "250,000 hab",
+                        intencionVoto: {
+                            labels: ['Morena (45%)', 'PAN/Alianza (33%)', 'MC (10%)', 'Otros/Indec. (12%)'],
+                            data: [45, 33, 10, 12],
+                            colors: ['#6a1b31', '#1565c0', '#ff9800', '#64748b']
+                        },
+                        lider: "Morena",
+                        ventaja: "+12%",
+                        color: "#6a1b31"
+                    },
+                    {
+                        name: "San Luis Río Colorado",
+                        poblacion: "190,000 hab",
+                        intencionVoto: {
+                            labels: ['Morena (48%)', 'PAN/Alianza (30%)', 'MC (9%)', 'Otros/Indec. (13%)'],
+                            data: [48, 30, 9, 13],
+                            colors: ['#6a1b31', '#1565c0', '#ff9800', '#64748b']
+                        },
+                        lider: "Morena",
+                        ventaja: "+18%",
+                        color: "#6a1b31"
+                    },
+                    {
+                        name: "Guaymas",
+                        poblacion: "150,000 hab",
+                        intencionVoto: {
+                            labels: ['Morena (41%)', 'PAN/Alianza (35%)', 'MC (11%)', 'Otros/Indec. (13%)'],
+                            data: [41, 35, 11, 13],
+                            colors: ['#6a1b31', '#1565c0', '#ff9800', '#64748b']
+                        },
+                        lider: "Morena",
+                        ventaja: "+6%",
+                        color: "#6a1b31"
+                    },
+                    {
+                        name: "Navojoa",
+                        poblacion: "140,000 hab",
+                        intencionVoto: {
+                            labels: ['Morena (50%)', 'PAN/Alianza (26%)', 'MC (10%)', 'Otros/Indec. (14%)'],
+                            data: [50, 26, 10, 14],
+                            colors: ['#6a1b31', '#1565c0', '#ff9800', '#64748b']
+                        },
+                        lider: "Morena",
+                        ventaja: "+24%",
+                        color: "#6a1b31"
+                    }
+                ]
+            },
+            "queretaro": {
+                name: "Querétaro",
+                gov: "Mauricio Kuri (PAN)",
+                ln: "2.0 Millones",
+                prefLeader: "PAN (40%)",
+                comp: "Muy Alta",
+                aspirantes: [
+                    { name: "Felifer Macías", role: "Alcalde Querétaro", party: "PAN", color: "#1565c0", initials: "FM" },
+                    { name: "Ricardo Anaya", role: "Senador", party: "PAN", color: "#1565c0", initials: "RA" },
+                    { name: "Santiago Nieto", role: "Morena", party: "Morena", color: "#6a1b31", initials: "SN" },
+                    { name: "Gilberto Herrera", role: "Senador", party: "Morena", color: "#6a1b31", initials: "GH" }
+                ],
+                scenarios: {
+                    a: { label: "Escenario A: Felifer vs Nieto", labels: ['Felifer Macías (42%)', 'Santiago Nieto (38%)', 'MC (8%)', 'Indecisos (12%)'], data: [42, 38, 8, 12], colors: ['#1565c0', '#6a1b31', '#ff9800', '#64748b'] },
+                    b: { label: "Escenario B: Anaya vs Nieto", labels: ['Ricardo Anaya (35%)', 'Santiago Nieto (40%)', 'MC (10%)', 'Indecisos (15%)'], data: [35, 40, 10, 15], colors: ['#1565c0', '#6a1b31', '#ff9800', '#64748b'] }
+                },
+                interna: { title: "Interna PAN", labels: ["Felifer Macías", "Ricardo Anaya", "Luis Nava", "Otros"], data: [35, 28, 22, 15], colors: ['#1565c0', '#42a5f5', '#90caf9', '#64748b'] },
+                notes: [
+                    { title: "Bastión Panista", text: "Querétaro sigue siendo el bastión más fuerte del PAN, pero Morena crece rápidamente con Santiago Nieto." },
+                    { title: "División Interna", text: "La candidatura de Anaya polariza; Felifer es visto como la renovación segura." }
+                ],
+                municipios: [
+                    { name: "Querétaro (Capital)", party: "PAN", candidate: "Felifer Macías", lead: "+8% vs Morena", color: "#1565c0" },
+                    { name: "San Juan del Río", party: "PAN", candidate: "Grupo Kuri", lead: "+4% Disputada", color: "#1565c0" },
+                    { name: "El Marqués", party: "PAN", candidate: "Rodrigo Monsalvo", lead: "+15% Sólida", color: "#1565c0" }
+                ],
+                municipiosDetallados: [
+                    {
+                        name: "Querétaro (Capital)",
+                        poblacion: "1.05M Hab | 780k LN",
+                        intencionVoto: {
+                            labels: ["PAN (48%)", "Morena (35%)", "MC (8%)", "Otros (9%)"],
+                            data: [48, 35, 8, 9],
+                            colors: ["#1565c0", "#6a1b31", "#ff9800", "#64748b"]
+                        },
+                        lider: { nombre: "Felifer Macías", partido: "PAN", color: "#1565c0" }
+                    },
+                    {
+                        name: "San Juan del Río",
+                        poblacion: "300k Hab | 210k LN",
+                        intencionVoto: {
+                            labels: ["PAN (42%)", "Morena (38%)", "MC (10%)", "Otros (10%)"],
+                            data: [42, 38, 10, 10],
+                            colors: ["#1565c0", "#6a1b31", "#ff9800", "#64748b"]
+                        },
+                        lider: { nombre: "Roberto Cabrera", partido: "PAN", color: "#1565c0" }
+                    },
+                    {
+                        name: "Corregidora",
+                        poblacion: "220k Hab | 160k LN",
+                        intencionVoto: {
+                            labels: ["PAN (55%)", "Morena (30%)", "MC (8%)", "Otros (7%)"],
+                            data: [55, 30, 8, 7],
+                            colors: ["#1565c0", "#6a1b31", "#ff9800", "#64748b"]
+                        },
+                        lider: { nombre: "Chepe Guerrero", partido: "PAN", color: "#1565c0" }
+                    },
+                    {
+                        name: "El Marqués",
+                        poblacion: "240k Hab | 170k LN",
+                        intencionVoto: {
+                            labels: ["PAN (50%)", "Morena (32%)", "MC (8%)", "Otros (10%)"],
+                            data: [50, 32, 8, 10],
+                            colors: ["#1565c0", "#6a1b31", "#ff9800", "#64748b"]
+                        },
+                        lider: { nombre: "Rodrigo Monsalvo", partido: "PAN", color: "#1565c0" }
+                    }
+                ]
+            },
+            "nuevoleon": {
+                name: "Nuevo León",
+                gov: "Samuel García (MC)",
+                ln: "4.8 Millones",
+                prefLeader: "MC / Morena (Empate)",
+                comp: "Extrema",
+                aspirantes: [
+                    { name: "Luis D. Colosio", role: "Senador", party: "Movimiento C.", color: "#ff9800", initials: "LC" },
+                    { name: "Adrián de la Garza", role: "Alcalde Monterrey", party: "PRI / Alianza", color: "#e53935", initials: "AD" },
+                    { name: "Tatiana Clouthier", role: "Morena", party: "Morena", color: "#6a1b31", initials: "TC" },
+                    { name: "Mariana Rodríguez", role: "MC", party: "Movimiento C.", color: "#ff9800", initials: "MR" }
+                ],
+                scenarios: {
+                    a: { label: "Escenario A: Colosio vs Adrián", labels: ['Colosio (38%)', 'Adrián de la Garza (32%)', 'Clouthier (25%)', 'Indecisos (5%)'], data: [38, 32, 25, 5], colors: ['#ff9800', '#e53935', '#6a1b31', '#64748b'] },
+                    b: { label: "Escenario B: Mariana vs Adrián", labels: ['Mariana R. (30%)', 'Adrián de la Garza (35%)', 'Clouthier (28%)', 'Indecisos (7%)'], data: [30, 35, 28, 7], colors: ['#ff9800', '#e53935', '#6a1b31', '#64748b'] }
+                },
+                interna: { title: "Interna MC", labels: ["Colosio Riojas", "Mariana Rdz", "Otros"], data: [45, 30, 25], colors: ['#ff9800', '#ffcc80', '#64748b'] },
+                notes: [
+                    { title: "Guerra de Tres", text: "Escenario único en el país de tres tercios reales (MC, PRIAN, Morena)." },
+                    { title: "Factor Colosio", text: "Colosio sigue siendo la marca más fuerte, pero Adrián controla la estructura territorial de Monterrey." }
+                ],
+                municipios: [
+                    { name: "Monterrey", party: "PRI / Alianza", candidate: "Adrián de la Garza", lead: "+4% vs MC", color: "#e53935" },
+                    { name: "San Pedro", party: "PAN", candidate: "Mauricio Fernández", lead: "+12% vs Indep.", color: "#1565c0" },
+                    { name: "Guadalupe", party: "MC", candidate: "Héctor García", lead: "+6% vs PRI", color: "#ff9800" }
+                ],
+                municipiosDetallados: [
+                    {
+                        name: "Monterrey (Capital)",
+                        poblacion: "1.2M Hab | 900k LN",
+                        intencionVoto: {
+                            labels: ["Morena (22%)", "Alianza (34%)", "MC (30%)", "Otros (14%)"],
+                            data: [22, 34, 30, 14],
+                            colors: ["#6a1b31", "#e53935", "#ff9800", "#64748b"]
+                        },
+                        lider: {
+                            nombre: "Adrián de la Garza",
+                            partido: "PRI / Alianza",
+                            color: "#e53935"
+                        }
+                    },
+
+                    {
+                        name: "San Pedro Garza García",
+                        poblacion: "130k Hab | 110k LN",
+                        intencionVoto: {
+                            labels: ["Morena (8%)", "PAN (55%)", "MC (25%)", "Otros (12%)"],
+                            data: [8, 55, 25, 12],
+                            colors: ["#6a1b31", "#1565c0", "#ff9800", "#64748b"]
+                        },
+                        lider: {
+                            nombre: "Mauricio Fernández",
+                            partido: "PAN",
+                            color: "#1565c0"
+                        }
+                    },
+                    {
+                        name: "Guadalupe",
+                        poblacion: "700k Hab | 550k LN",
+                        intencionVoto: {
+                            labels: ["Morena (21%)", "PRI/PAN (28%)", "MC (34%)", "Otros (17%)"],
+                            data: [21, 28, 34, 17],
+                            colors: ["#6a1b31", "#1565c0", "#ff9800", "#64748b"]
+                        },
+                        lider: {
+                            nombre: "Héctor García",
+                            partido: "MC",
+                            color: "#ff9800"
+                        }
+                    }
+                ]
+            },
+            "chihuahua": {
+                name: "Chihuahua",
+                gov: "Maru Campos (PAN)",
+                ln: "3.3 Millones",
+                prefLeader: "Morena (+8%)",
+                comp: "Alta",
+                aspirantes: [
+                    { name: "Andrea Chávez", role: "Senadora", party: "Morena", color: "#6a1b31", initials: "AC" },
+                    { name: "Marco Bonilla", role: "Alcalde Chihuahua", party: "PAN", color: "#1565c0", initials: "MB" },
+                    { name: "Cruz Pérez C.", role: "Alcalde Juárez", party: "Morena", color: "#6a1b31", initials: "CP" },
+                    { name: "Tony Meléndez", role: "Diputado", party: "PRI", color: "#e53935", initials: "TM" }
+                ],
+                scenarios: {
+                    a: { label: "Escenario A: Andrea vs Bonilla", labels: ['Andrea Chávez (44%)', 'Marco Bonilla (38%)', 'MC (5%)', 'Indecisos (13%)'], data: [44, 38, 5, 13], colors: ['#6a1b31', '#1565c0', '#ff9800', '#64748b'] },
+                    b: { label: "Escenario B: Cruz vs Bonilla", labels: ['Cruz Pérez (40%)', 'Marco Bonilla (40%)', 'MC (5%)', 'Indecisos (15%)'], data: [40, 40, 5, 15], colors: ['#6a1b31', '#1565c0', '#ff9800', '#64748b'] }
+                },
+                interna: { title: "Interna Morena", labels: ["Andrea Chávez", "Cruz Pérez", "Juan C. Loera", "Otros"], data: [40, 28, 15, 17], colors: ['#6a1b31', '#ef5350', '#7f0000', '#64748b'] },
+                notes: [
+                    { title: "Juárez vs Chihuahua", text: "La clásica división geográfica: Morena domina Juárez, PAN domina la capital." },
+                    { title: "Andrea Chávez", text: "Perfil nacional fuerte que moviliza el voto joven, pero polariza sectores tradicionales." }
+                ],
+                municipios: [
+                    { name: "Chihuahua (Cap)", party: "PAN", candidate: "Marco Bonilla", lead: "+12% Bastión", color: "#1565c0" },
+                    { name: "Cd. Juárez", party: "Morena", candidate: "Grupo Pérez Cuéllar", lead: "+20% Bastión", color: "#6a1b31" }
+                ],
+                municipiosDetallados: [
+                    {
+                        name: "Chihuahua (Capital)",
+                        poblacion: "940k Hab | 700k LN",
+                        intencionVoto: {
+                            labels: ["PAN (52%)", "Morena (35%)", "MC (6%)", "Otros (7%)"],
+                            data: [52, 35, 6, 7],
+                            colors: ["#1565c0", "#6a1b31", "#ff9800", "#64748b"]
+                        },
+                        lider: { nombre: "Marco Bonilla", partido: "PAN", color: "#1565c0" }
+                    },
+                    {
+                        name: "Ciudad Juárez",
+                        poblacion: "1.5M Hab | 1.1M LN",
+                        intencionVoto: {
+                            labels: ["Morena (58%)", "PAN (25%)", "MC (7%)", "Otros (10%)"],
+                            data: [58, 25, 7, 10],
+                            colors: ["#6a1b31", "#1565c0", "#ff9800", "#64748b"]
+                        },
+                        lider: { nombre: "Cruz Pérez Cuéllar", partido: "Morena", color: "#6a1b31" }
+                    },
+                    {
+                        name: "Cuauhtémoc",
+                        poblacion: "180k Hab | 130k LN",
+                        intencionVoto: {
+                            labels: ["Morena (42%)", "PAN (40%)", "MC (10%)", "Otros (8%)"],
+                            data: [42, 40, 10, 8],
+                            colors: ["#6a1b31", "#1565c0", "#ff9800", "#64748b"]
+                        },
+                        lider: { nombre: "Beto Pérez", partido: "Morena/Ali", color: "#6a1b31" }
+                    },
+                    {
+                        name: "Delicias",
+                        poblacion: "150k Hab | 110k LN",
+                        intencionVoto: {
+                            labels: ["PAN (48%)", "Morena (38%)", "MC (8%)", "Otros (6%)"],
+                            data: [48, 38, 8, 6],
+                            colors: ["#1565c0", "#6a1b31", "#ff9800", "#64748b"]
+                        },
+                        lider: { nombre: "Jesús Valenciano", partido: "PAN", color: "#1565c0" }
+                    }
+                ]
+            },
+            "michoacan": {
+                name: "Michoacán",
+                gov: "Alfredo Ramírez (Morena)",
+                ln: "3.8 Millones",
+                prefLeader: "Morena (+15%)",
+                comp: "Media",
+                aspirantes: [
+                    { name: "Raúl Morón", role: "Senador", party: "Morena", color: "#6a1b31", initials: "RM" },
+                    { name: "Alfonso Martínez", role: "Alcalde Morelia", party: "PAN / Alianza", color: "#1565c0", initials: "AM" },
+                    { name: "Fabiola Alanís", role: "Diputada", party: "Morena", color: "#6a1b31", initials: "FA" },
+                    { name: "Carlos Herrera", role: "MC", party: "Movimiento C.", color: "#ff9800", initials: "CH" }
+                ],
+                scenarios: {
+                    a: { label: "Escenario A: Morón vs Alfonso", labels: ['Raúl Morón (45%)', 'Alfonso Mtz (30%)', 'Herrera (10%)', 'Indecisos (15%)'], data: [45, 30, 10, 15], colors: ['#6a1b31', '#1565c0', '#ff9800', '#64748b'] },
+                    b: { label: "Escenario B: Fabiola vs Alfonso", labels: ['Fabiola A. (40%)', 'Alfonso Mtz (32%)', 'Herrera (12%)', 'Indecisos (16%)'], data: [40, 32, 12, 16], colors: ['#6a1b31', '#1565c0', '#ff9800', '#64748b'] }
+                },
+                interna: { title: "Interna Morena", labels: ["Raúl Morón", "Fabiola Alanís", "C. Torres Piña", "Otros"], data: [31, 28, 16, 25], colors: ['#6a1b31', '#ef5350', '#7f0000', '#64748b'] },
+                notes: [
+                    { title: "Dominio Morena", text: "La marca estatal es fuerte, aunque Alfonso Martínez (PAN) es un candidato opositor excepcionalmente competitivo en Morelia." }
+                ],
+                municipios: [
+                    { name: "Morelia", party: "PAN / Indep", candidate: "Alfonso Martínez", lead: "+5% vs Morena", color: "#1565c0" },
+                    { name: "Uruapan", party: "Independiente", candidate: "Grecia Quiroz", lead: "+15% vs Partidos", color: "#795548" },
+                    { name: "Lázaro Cárdenas", party: "Morena", candidate: "Grupo Itzé", lead: "+20%", color: "#6a1b31" }
+                ],
+                municipiosDetallados: [
+                    {
+                        name: "Morelia (Capital)",
+                        poblacion: "850k Hab | 600k LN",
+                        intencionVoto: {
+                            labels: ["PAN/PRD (45%)", "Morena (40%)", "MC (8%)", "Otros (7%)"],
+                            data: [45, 40, 8, 7],
+                            colors: ["#1565c0", "#6a1b31", "#ff9800", "#64748b"]
+                        },
+                        lider: { nombre: "Alfonso Martínez", partido: "PAN/Alianza", color: "#1565c0" }
+                    },
+                    {
+                        name: "Uruapan",
+                        poblacion: "360k Hab | 250k LN",
+                        intencionVoto: {
+                            labels: ["Morena (42%)", "Indep (30%)", "PAN/PRI (18%)", "Otros (10%)"],
+                            data: [42, 30, 18, 10],
+                            colors: ["#6a1b31", "#795548", "#1565c0", "#64748b"]
+                        },
+                        lider: { nombre: "Nacho Campos", partido: "Morena", color: "#6a1b31" }
+                    },
+                    {
+                        name: "Lázaro Cárdenas",
+                        poblacion: "200k Hab | 140k LN",
+                        intencionVoto: {
+                            labels: ["Morena (55%)", "PAN/PRI (25%)", "MC (10%)", "Otros (10%)"],
+                            data: [55, 25, 10, 10],
+                            colors: ["#6a1b31", "#1565c0", "#ff9800", "#64748b"]
+                        },
+                        lider: { nombre: "Itzé Camacho", partido: "Morena", color: "#6a1b31" }
+                    },
+                    {
+                        name: "Zamora",
+                        poblacion: "210k Hab | 150k LN",
+                        intencionVoto: {
+                            labels: ["PAN/PRI (40%)", "Morena (38%)", "MC (12%)", "Otros (10%)"],
+                            data: [40, 38, 12, 10],
+                            colors: ["#1565c0", "#6a1b31", "#ff9800", "#64748b"]
+                        },
+                        lider: { nombre: "Carlos Soto", partido: "PAN", color: "#1565c0" }
+                    }
+                ]
+            },
+            "aguascalientes": {
+                name: "Aguascalientes",
+                gov: "Tere Jiménez (PAN)",
+                ln: "1.1 Millones",
+                prefLeader: "PAN (42%)",
+                comp: "Alta",
+                aspirantes: [
+                    { name: "Leo Montañez", role: "Senador", party: "PAN", color: "#1565c0", initials: "LM" },
+                    { name: "Arturo Ávila", role: "Secretario Gob", party: "Morena", color: "#6a1b31", initials: "AA" }
+                ],
+                scenarios: {
+                    a: { label: "Escenario A: Montañez vs Ávila", labels: ['Leo Montañez (42%)', 'Arturo Ávila (35%)', 'MC (8%)', 'Indecisos (15%)'], data: [42, 35, 8, 15], colors: ['#1565c0', '#6a1b31', '#ff9800', '#64748b'] },
+                    b: { label: "Escenario B: Alternativo", labels: ['PAN (40%)', 'Morena (38%)', 'MC (10%)', 'Indecisos (12%)'], data: [40, 38, 10, 12], colors: ['#1565c0', '#6a1b31', '#ff9800', '#64748b'] }
+                },
+                interna: { title: "Interna PAN", labels: ["Leo Montañez", "Otros"], data: [65, 35], colors: ['#1565c0', '#64748b'] },
+                notes: [{ title: "Bastión Panista", text: "Aguascalientes es uno de los estados más sólidos del PAN en el país." }],
+                municipios: [{ name: "Aguascalientes (Cap)", party: "PAN", candidate: "Grupo Tere", lead: "+13%", color: "#1565c0" }],
+                municipiosDetallados: [
+                    {
+                        name: "Aguascalientes (Capital)",
+                        poblacion: "930,000 hab",
+                        intencionVoto: {
+                            labels: ['Morena (32%)', 'PAN/Alianza (45%)', 'MC (10%)', 'Otros/Indec. (13%)'],
+                            data: [32, 45, 10, 13],
+                            colors: ['#6a1b31', '#1565c0', '#ff9800', '#64748b']
+                        },
+                        lider: "PAN/Alianza",
+                        ventaja: "+13%",
+                        color: "#1565c0"
+                    },
+                    {
+                        name: "Jesús María",
+                        poblacion: "130,000 hab",
+                        intencionVoto: {
+                            labels: ['Morena (30%)', 'PAN/Alianza (48%)', 'MC (8%)', 'Otros/Indec. (14%)'],
+                            data: [30, 48, 8, 14],
+                            colors: ['#6a1b31', '#1565c0', '#ff9800', '#64748b']
+                        },
+                        lider: "PAN/Alianza",
+                        ventaja: "+18%",
+                        color: "#1565c0"
+                    },
+                    {
+                        name: "Calvillo",
+                        poblacion: "60,000 hab",
+                        intencionVoto: {
+                            labels: ['Morena (35%)', 'PAN/Alianza (42%)', 'MC (8%)', 'Otros/Indec. (15%)'],
+                            data: [35, 42, 8, 15],
+                            colors: ['#6a1b31', '#1565c0', '#ff9800', '#64748b']
+                        },
+                        lider: "PAN/Alianza",
+                        ventaja: "+7%",
+                        color: "#1565c0"
+                    },
+                    {
+                        name: "Rincón de Romos",
+                        poblacion: "60,000 hab",
+                        intencionVoto: {
+                            labels: ['Morena (40%)', 'PAN/Alianza (35%)', 'MC (8%)', 'Otros/Indec. (17%)'],
+                            data: [40, 35, 8, 17],
+                            colors: ['#6a1b31', '#1565c0', '#ff9800', '#64748b']
+                        },
+                        lider: "Morena",
+                        ventaja: "+5%",
+                        color: "#6a1b31"
+                    },
+                    {
+                        name: "Pabellón de Arteaga",
+                        poblacion: "50,000 hab",
+                        intencionVoto: {
+                            labels: ['Morena (39%)', 'PAN/Alianza (36%)', 'MC (10%)', 'Otros/Indec. (15%)'],
+                            data: [39, 36, 10, 15],
+                            colors: ['#6a1b31', '#1565c0', '#ff9800', '#64748b']
+                        },
+                        lider: "Morena",
+                        ventaja: "+3%",
+                        color: "#6a1b31"
+                    }
+                ]
+            },
+            "bajacalifornia": {
+                name: "Baja California",
+                gov: "Marina del Pilar (Morena)",
+                ln: "3.2 Millones",
+                prefLeader: "Morena (48%)",
+                comp: "Media",
+                aspirantes: [
+                    { name: "Lupita Jones", role: "Senadora", party: "Morena", color: "#6a1b31", initials: "LJ" },
+                    { name: "Jorge Ramos", role: "Alcalde Tijuana", party: "PAN", color: "#1565c0", initials: "JR" }
+                ],
+                scenarios: {
+                    a: { label: "Escenario A: Lupita vs Ramos", labels: ['Lupita Jones (46%)', 'Jorge Ramos (32%)', 'MC (8%)', 'Indecisos (14%)'], data: [46, 32, 8, 14], colors: ['#6a1b31', '#1565c0', '#ff9800', '#64748b'] },
+                    b: { label: "Escenario B: Alternativo", labels: ['Morena (44%)', 'PAN (34%)', 'MC (10%)', 'Indecisos (12%)'], data: [44, 34, 10, 12], colors: ['#6a1b31', '#1565c0', '#ff9800', '#64748b'] }
+                },
+                interna: { title: "Interna Morena", labels: ["Lupita Jones", "Otros"], data: [55, 45], colors: ['#6a1b31', '#64748b'] },
+                notes: [{ title: "Dominio Morena", text: "Marina del Pilar consolidó a Morena en el estado fronterizo." }],
+                municipios: [
+                    { name: "Mexicali (Cap)", party: "Morena", candidate: "Norma Bustamante", lead: "+10%", color: "#6a1b31" },
+                    { name: "Tijuana", party: "Morena", candidate: "Grupo Marina", lead: "+15%", color: "#6a1b31" }
+                ],
+                municipiosDetallados: [
+                    {
+                        name: "Tijuana",
+                        poblacion: "2.0M Hab | 1.5M LN",
+                        intencionVoto: {
+                            labels: ["Morena (55%)", "PAN (25%)", "MC (10%)", "Otros (10%)"],
+                            data: [55, 25, 10, 10],
+                            colors: ["#6a1b31", "#1565c0", "#ff9800", "#64748b"]
+                        },
+                        lider: { nombre: "Ismael Burgueño", partido: "Morena", color: "#6a1b31" }
+                    },
+                    {
+                        name: "Mexicali (Capital)",
+                        poblacion: "1.1M Hab | 800k LN",
+                        intencionVoto: {
+                            labels: ["Morena (50%)", "PAN (30%)", "MC (10%)", "Otros (10%)"],
+                            data: [50, 30, 10, 10],
+                            colors: ["#6a1b31", "#1565c0", "#ff9800", "#64748b"]
+                        },
+                        lider: { nombre: "Norma Bustamante", partido: "Morena", color: "#6a1b31" }
+                    },
+                    {
+                        name: "Ensenada",
+                        poblacion: "450k Hab | 350k LN",
+                        intencionVoto: {
+                            labels: ["Morena (48%)", "PAN (22%)", "MC (15%)", "Otros (15%)"],
+                            data: [48, 22, 15, 15],
+                            colors: ["#6a1b31", "#1565c0", "#ff9800", "#64748b"]
+                        },
+                        lider: { nombre: "Claudia Agatón", partido: "Morena", color: "#6a1b31" }
+                    },
+                    {
+                        name: "Tecate",
+                        poblacion: "110k Hab | 80k LN",
+                        intencionVoto: {
+                            labels: ["Morena (45%)", "PES/Ind (25%)", "PAN (15%)", "Otros (15%)"],
+                            data: [45, 25, 15, 15],
+                            colors: ["#6a1b31", "#8e24aa", "#1565c0", "#64748b"]
+                        },
+                        lider: { nombre: "Román Cota", partido: "Morena", color: "#6a1b31" }
+                    }
+                ]
+            },
+            "bcs": {
+                name: "Baja California Sur",
+                gov: "Víctor Castro (Morena)",
+                ln: "0.8 Millones",
+                prefLeader: "Morena (45%)",
+                comp: "Media",
+                aspirantes: [
+                    { name: "Milena Quiroga", role: "Alcaldesa La Paz", party: "Morena", color: "#6a1b31", initials: "MQ" },
+                    { name: "Ricardo Barroso", role: "Diputado", party: "PAN", color: "#1565c0", initials: "RB" }
+                ],
+                scenarios: {
+                    a: { label: "Escenario A: Milena vs Barroso", labels: ['Milena Quiroga (44%)', 'Ricardo Barroso (30%)', 'MC (10%)', 'Indecisos (16%)'], data: [44, 30, 10, 16], colors: ['#6a1b31', '#1565c0', '#ff9800', '#64748b'] },
+                    b: { label: "Escenario B: Alternativo", labels: ['Morena (42%)', 'PAN (32%)', 'MC (12%)', 'Indecisos (14%)'], data: [42, 32, 12, 14], colors: ['#6a1b31', '#1565c0', '#ff9800', '#64748b'] }
+                },
+                interna: { title: "Interna Morena", labels: ["Milena Quiroga", "Otros"], data: [60, 40], colors: ['#6a1b31', '#64748b'] },
+                notes: [{ title: "Estado Turístico", text: "BCS depende del voto turístico y de servicios." }],
+                municipios: [{ name: "La Paz", party: "Morena", candidate: "Milena Quiroga", lead: "+12%", color: "#6a1b31" }],
+                municipiosDetallados: [
+                    {
+                        name: "La Paz (Capital)",
+                        poblacion: "290,000 hab",
+                        intencionVoto: {
+                            labels: ['Morena (46%)', 'PAN/Alianza (32%)', 'MC (8%)', 'Otros/Indec. (14%)'],
+                            data: [46, 32, 8, 14],
+                            colors: ['#6a1b31', '#1565c0', '#ff9800', '#64748b']
+                        },
+                        lider: "Morena",
+                        ventaja: "+14%",
+                        color: "#6a1b31"
+                    },
+                    {
+                        name: "Los Cabos",
+                        poblacion: "350,000 hab",
+                        intencionVoto: {
+                            labels: ['Morena (42%)', 'PAN/Alianza (30%)', 'MC (12%)', 'Otros/Indec. (16%)'],
+                            data: [42, 30, 12, 16],
+                            colors: ['#6a1b31', '#1565c0', '#ff9800', '#64748b']
+                        },
+                        lider: "Morena",
+                        ventaja: "+12%",
+                        color: "#6a1b31"
+                    },
+                    {
+                        name: "Comondú",
+                        poblacion: "70,000 hab",
+                        intencionVoto: {
+                            labels: ['Morena (48%)', 'PAN/Alianza (25%)', 'MC (10%)', 'Otros/Indec. (17%)'],
+                            data: [48, 25, 10, 17],
+                            colors: ['#6a1b31', '#1565c0', '#ff9800', '#64748b']
+                        },
+                        lider: "Morena",
+                        ventaja: "+23%",
+                        color: "#6a1b31"
+                    },
+                    {
+                        name: "Mulegé",
+                        poblacion: "60,000 hab",
+                        intencionVoto: {
+                            labels: ['Morena (45%)', 'PAN/Alianza (28%)', 'MC (8%)', 'Otros/Indec. (19%)'],
+                            data: [45, 28, 8, 19],
+                            colors: ['#6a1b31', '#1565c0', '#ff9800', '#64748b']
+                        },
+                        lider: "Morena",
+                        ventaja: "+17%",
+                        color: "#6a1b31"
+                    },
+                    {
+                        name: "Loreto",
+                        poblacion: "20,000 hab",
+                        intencionVoto: {
+                            labels: ['PAN/Alianza (40%)', 'Morena (38%)', 'MC (10%)', 'Otros/Indec. (12%)'],
+                            data: [38, 40, 10, 12], // Note: PAN leads, so data needs to match leader logic if dynamic, or static labels. Swapped for visual accuracy if stacked bars rely on index 0=Morena
+                            colors: ['#6a1b31', '#1565c0', '#ff9800', '#64748b']
+                        },
+                        lider: "PAN/Alianza",
+                        ventaja: "+2%",
+                        color: "#1565c0"
+                    }
+                ]
+            },
+            "campeche": {
+                name: "Campeche",
+                gov: "Layda Sansores (Morena)",
+                ln: "0.9 Millones",
+                prefLeader: "Morena (52%)",
+                comp: "Baja",
+                aspirantes: [
+                    { name: "Christian Castro", role: "Secretario", party: "Morena", color: "#6a1b31", initials: "CC" },
+                    { name: "Edgar Hernández", role: "Diputado", party: "PRI", color: "#e53935", initials: "EH" }
+                ],
+                scenarios: {
+                    a: { label: "Escenario A: Castro vs Hernández", labels: ['Christian Castro (50%)', 'Edgar Hernández (25%)', 'MC (8%)', 'Indecisos (17%)'], data: [50, 25, 8, 17], colors: ['#6a1b31', '#e53935', '#ff9800', '#64748b'] },
+                    b: { label: "Escenario B: Alternativo", labels: ['Morena (48%)', 'PRI (28%)', 'MC (10%)', 'Indecisos (14%)'], data: [48, 28, 10, 14], colors: ['#6a1b31', '#e53935', '#ff9800', '#64748b'] }
+                },
+                interna: { title: "Interna Morena", labels: ["Christian Castro", "Otros"], data: [70, 30], colors: ['#6a1b31', '#64748b'] },
+                notes: [{ title: "Efecto Layda", text: "Sansores tiene fuerte influencia en la definición del candidato." }],
+                municipios: [{ name: "Campeche (Cap)", party: "Morena", candidate: "Grupo Layda", lead: "+20%", color: "#6a1b31" }],
+                municipiosDetallados: [
+                    {
+                        name: "Campeche (Capital)",
+                        poblacion: "300k Hab | 220k LN",
+                        intencionVoto: {
+                            labels: ["MC (40%)", "Morena (35%)", "PRI (15%)", "Otros (10%)"],
+                            data: [40, 35, 15, 10],
+                            colors: ["#ff9800", "#6a1b31", "#e53935", "#64748b"]
+                        },
+                        lider: { nombre: "Biby Rabelo", partido: "MC", color: "#ff9800" }
+                    },
+                    {
+                        name: "Carmen",
+                        poblacion: "250k Hab | 180k LN",
+                        intencionVoto: {
+                            labels: ["Morena (50%)", "MC (20%)", "PAN/PRI (20%)", "Otros (10%)"],
+                            data: [50, 20, 20, 10],
+                            colors: ["#6a1b31", "#ff9800", "#1565c0", "#64748b"]
+                        },
+                        lider: { nombre: "Pablo Gutiérrez", partido: "Morena", color: "#6a1b31" }
+                    }
+                ]
+            },
+            "colima": {
+                name: "Colima",
+                gov: "Indira Vizcaíno (Morena)",
+                ln: "0.7 Millones",
+                prefLeader: "Morena (44%)",
+                comp: "Alta",
+                aspirantes: [
+                    { name: "Virgilio Mendoza", role: "Senador", party: "Morena", color: "#6a1b31", initials: "VM" },
+                    { name: "Mely Romero", role: "Ex-Gobernadora", party: "PRI", color: "#e53935", initials: "MR" }
+                ],
+                scenarios: {
+                    a: { label: "Escenario A: Virgilio vs Mely", labels: ['Virgilio Mendoza (42%)', 'Mely Romero (35%)', 'MC (10%)', 'Indecisos (13%)'], data: [42, 35, 10, 13], colors: ['#6a1b31', '#e53935', '#ff9800', '#64748b'] },
+                    b: { label: "Escenario B: Alternativo", labels: ['Morena (40%)', 'PRI (38%)', 'MC (12%)', 'Indecisos (10%)'], data: [40, 38, 12, 10], colors: ['#6a1b31', '#e53935', '#ff9800', '#64748b'] }
+                },
+                interna: { title: "Interna Morena", labels: ["Virgilio Mendoza", "Otros"], data: [58, 42], colors: ['#6a1b31', '#64748b'] },
+                notes: [{ title: "Estado Pequeño", text: "Colima es uno de los estados más pequeños pero muy competitivo." }],
+                municipios: [{ name: "Colima (Cap)", party: "Morena", candidate: "Grupo Indira", lead: "+8%", color: "#6a1b31" }],
+                municipiosDetallados: [
+                    {
+                        name: "Colima (Capital)",
+                        poblacion: "160k Hab | 120k LN",
+                        intencionVoto: {
+                            labels: ["PAN/PRI (45%)", "MC (30%)", "Morena (20%)", "Otros (5%)"],
+                            data: [45, 30, 20, 5],
+                            colors: ["#1565c0", "#ff9800", "#6a1b31", "#64748b"]
+                        },
+                        lider: { nombre: "Riult Rivera", partido: "PAN/PRI", color: "#1565c0" }
+                    },
+                    {
+                        name: "Manzanillo",
+                        poblacion: "200k Hab | 150k LN",
+                        intencionVoto: {
+                            labels: ["Morena (48%)", "PVEM (20%)", "PAN/PRI (20%)", "Otros (12%)"],
+                            data: [48, 20, 20, 12],
+                            colors: ["#6a1b31", "#4caf50", "#1565c0", "#64748b"]
+                        },
+                        lider: { nombre: "Griselda Martínez", partido: "Morena", color: "#6a1b31" }
+                    },
+                    {
+                        name: "Villa de Álvarez",
+                        poblacion: "150k Hab | 110k LN",
+                        intencionVoto: {
+                            labels: ["PAN/PRI (42%)", "Morena (35%)", "MC (15%)", "Otros (8%)"],
+                            data: [42, 35, 15, 8],
+                            colors: ["#1565c0", "#6a1b31", "#ff9800", "#64748b"]
+                        },
+                        lider: { nombre: "Tey Gutiérrez", partido: "PRI/PAN", color: "#1565c0" }
+                    },
+                    {
+                        name: "Tecomán",
+                        poblacion: "130k Hab | 95k LN",
+                        intencionVoto: {
+                            labels: ["Morena (46%)", "PAN/PRI (32%)", "MC (10%)", "Otros (12%)"],
+                            data: [46, 32, 10, 12],
+                            colors: ["#6a1b31", "#1565c0", "#ff9800", "#64748b"]
+                        },
+                        lider: { nombre: "Elias Lozano", partido: "Morena", color: "#6a1b31" }
+                    },
+                    {
+                        name: "Armería",
+                        poblacion: "35k Hab | 25k LN",
+                        intencionVoto: {
+                            labels: ["Morena (40%)", "PVEM (25%)", "PAN/PRI (25%)", "Otros (10%)"],
+                            data: [40, 25, 25, 10],
+                            colors: ["#6a1b31", "#4caf50", "#1565c0", "#64748b"]
+                        },
+                        lider: { nombre: "Diana Zepeda", partido: "Morena", color: "#6a1b31" }
+                    },
+                    {
+                        name: "Cuauhtémoc",
+                        poblacion: "30k Hab | 22k LN",
+                        intencionVoto: {
+                            labels: ["PAN/PRI (44%)", "Morena (38%)", "MC (10%)", "Otros (8%)"],
+                            data: [44, 38, 10, 8],
+                            colors: ["#1565c0", "#6a1b31", "#ff9800", "#64748b"]
+                        },
+                        lider: { nombre: "Gabriela Mejía", partido: "PRI/PAN", color: "#1565c0" }
+                    }
+                ]
+            },
+            "guerrero": {
+                name: "Guerrero",
+                gov: "Evelyn Salgado (Morena)",
+                ln: "3.5 Millones",
+                prefLeader: "Morena (55%)",
+                comp: "Baja",
+                aspirantes: [
+                    { name: "Pablo Amílcar", role: "Diputado", party: "Morena", color: "#6a1b31", initials: "PA" },
+                    { name: "Mario Moreno", role: "Senador", party: "PRI", color: "#e53935", initials: "MM" }
+                ],
+                scenarios: {
+                    a: { label: "Escenario A: Amílcar vs Moreno", labels: ['Pablo Amílcar (52%)', 'Mario Moreno (25%)', 'MC (8%)', 'Indecisos (15%)'], data: [52, 25, 8, 15], colors: ['#6a1b31', '#e53935', '#ff9800', '#64748b'] },
+                    b: { label: "Escenario B: Alternativo", labels: ['Morena (50%)', 'PRI (28%)', 'MC (10%)', 'Indecisos (12%)'], data: [50, 28, 10, 12], colors: ['#6a1b31', '#e53935', '#ff9800', '#64748b'] }
+                },
+                interna: { title: "Interna Morena", labels: ["Pablo Amílcar", "Otros"], data: [65, 35], colors: ['#6a1b31', '#64748b'] },
+                notes: [{ title: "Bastión Morena", text: "Guerrero es uno de los estados más sólidos de Morena." }],
+                municipios: [
+                    { name: "Chilpancingo (Cap)", party: "Morena", candidate: "Grupo Evelyn", lead: "+18%", color: "#6a1b31" },
+                    { name: "Acapulco", party: "Morena", candidate: "Grupo Evelyn", lead: "+25%", color: "#6a1b31" }
+                ],
+                municipiosDetallados: [
+                    {
+                        name: "Acapulco",
+                        poblacion: "800k Hab | 600k LN",
+                        intencionVoto: {
+                            labels: ["Morena (58%)", "PRI/PRD (20%)", "MC (12%)", "Otros (10%)"],
+                            data: [58, 20, 12, 10],
+                            colors: ["#6a1b31", "#e53935", "#ff9800", "#64748b"]
+                        },
+                        lider: { nombre: "Abelina López", partido: "Morena", color: "#6a1b31" }
+                    },
+                    {
+                        name: "Chilpancingo (Capital)",
+                        poblacion: "280k Hab | 200k LN",
+                        intencionVoto: {
+                            labels: ["Morena (45%)", "PRI/PRD (35%)", "MC (10%)", "Otros (10%)"],
+                            data: [45, 35, 10, 10],
+                            colors: ["#6a1b31", "#e53935", "#ff9800", "#64748b"]
+                        },
+                        lider: { nombre: "Morena Ali", partido: "Morena", color: "#6a1b31" }
+                    },
+                    {
+                        name: "Iguala",
+                        poblacion: "150k Hab | 110k LN",
+                        intencionVoto: {
+                            labels: ["Morena (50%)", "PRI/PRD (25%)", "MC (10%)", "Otros (15%)"],
+                            data: [50, 25, 10, 15],
+                            colors: ["#6a1b31", "#e53935", "#ff9800", "#64748b"]
+                        },
+                        lider: { nombre: "Erik Catalán", partido: "Morena", color: "#6a1b31" }
+                    },
+                    {
+                        name: "Zihuatanejo",
+                        poblacion: "120k Hab | 90k LN",
+                        intencionVoto: {
+                            labels: ["PRI/PRD (48%)", "Morena (35%)", "MC (10%)", "Otros (7%)"],
+                            data: [48, 35, 10, 7],
+                            colors: ["#e53935", "#6a1b31", "#ff9800", "#64748b"]
+                        },
+                        lider: { nombre: "Jorge Sánchez", partido: "PRI/PRD", color: "#e53935" }
+                    }
+                ]
+            },
+            "nayarit": {
+                name: "Nayarit",
+                gov: "Miguel Navarro (Morena)",
+                ln: "1.2 Millones",
+                prefLeader: "Morena (46%)",
+                comp: "Media",
+                aspirantes: [
+                    { name: "Gloria Núñez", role: "Senadora", party: "Morena", color: "#6a1b31", initials: "GN" },
+                    { name: "Manuel Cota", role: "Ex-Gobernador", party: "PRI", color: "#e53935", initials: "MC" }
+                ],
+                scenarios: {
+                    a: { label: "Escenario A: Gloria vs Cota", labels: ['Gloria Núñez (44%)', 'Manuel Cota (30%)', 'MC (10%)', 'Indecisos (16%)'], data: [44, 30, 10, 16], colors: ['#6a1b31', '#e53935', '#ff9800', '#64748b'] },
+                    b: { label: "Escenario B: Alternativo", labels: ['Morena (42%)', 'PRI (32%)', 'MC (12%)', 'Indecisos (14%)'], data: [42, 32, 12, 14], colors: ['#6a1b31', '#e53935', '#ff9800', '#64748b'] }
+                },
+                interna: { title: "Interna Morena", labels: ["Gloria Núñez", "Otros"], data: [55, 45], colors: ['#6a1b31', '#64748b'] },
+                notes: [{ title: "Costa Pacífico", text: "Nayarit tiene fuerte influencia turística." }],
+                municipios: [{ name: "Tepic", party: "Morena", candidate: "Grupo Navarro", lead: "+12%", color: "#6a1b31" }],
+                municipiosDetallados: [
+                    {
+                        name: "Tepic (Capital)",
+                        poblacion: "400k Hab | 300k LN",
+                        intencionVoto: {
+                            labels: ["Morena (52%)", "PAN/PRI (25%)", "MC (15%)", "Otros (8%)"],
+                            data: [52, 25, 15, 8],
+                            colors: ["#6a1b31", "#1565c0", "#ff9800", "#64748b"]
+                        },
+                        lider: { nombre: "Geraldine Ponce", partido: "Morena", color: "#6a1b31" }
+                    },
+                    {
+                        name: "Bahía de Banderas",
+                        poblacion: "180k Hab | 130k LN",
+                        intencionVoto: {
+                            labels: ["Morena (55%)", "PAN/PRI (20%)", "MC (15%)", "Otros (10%)"],
+                            data: [55, 20, 15, 10],
+                            colors: ["#6a1b31", "#1565c0", "#ff9800", "#64748b"]
+                        },
+                        lider: { nombre: "Mirtha Villalvazo", partido: "Morena", color: "#6a1b31" }
+                    },
+                    {
+                        name: "Compostela",
+                        poblacion: "80k Hab | 60k LN",
+                        intencionVoto: {
+                            labels: ["Morena (48%)", "PAN/PRI (30%)", "MC (10%)", "Otros (12%)"],
+                            data: [48, 30, 10, 12],
+                            colors: ["#6a1b31", "#1565c0", "#ff9800", "#64748b"]
+                        },
+                        lider: { nombre: "Morena Ali", partido: "Morena", color: "#6a1b31" }
+                    }
+                ]
+            },
+            "quintanaroo": {
+                name: "Quintana Roo",
+                gov: "Mara Lezama (Morena)",
+                ln: "1.8 Millones",
+                prefLeader: "Morena (48%)",
+                comp: "Media",
+                aspirantes: [
+                    { name: "Cristina Torres", role: "Senadora", party: "Morena", color: "#6a1b31", initials: "CT" },
+                    { name: "Laura Fernández", role: "Ex-Alcaldesa", party: "PAN", color: "#1565c0", initials: "LF" }
+                ],
+                scenarios: {
+                    a: { label: "Escenario A: Cristina vs Laura", labels: ['Cristina Torres (46%)', 'Laura Fernández (32%)', 'MC (10%)', 'Indecisos (12%)'], data: [46, 32, 10, 12], colors: ['#6a1b31', '#1565c0', '#ff9800', '#64748b'] },
+                    b: { label: "Escenario B: Alternativo", labels: ['Morena (44%)', 'PAN (34%)', 'MC (12%)', 'Indecisos (10%)'], data: [44, 34, 12, 10], colors: ['#6a1b31', '#1565c0', '#ff9800', '#64748b'] }
+                },
+                interna: { title: "Interna Morena", labels: ["Cristina Torres", "Otros"], data: [60, 40], colors: ['#6a1b31', '#64748b'] },
+                notes: [{ title: "Zona Turística", text: "Cancún domina la economía y política del estado." }],
+                municipios: [{ name: "Benito Juárez", party: "Morena", candidate: "Grupo Mara", lead: "+15%", color: "#6a1b31" }],
+                municipiosDetallados: [
+                    {
+                        name: "Cancún (Benito Juárez)",
+                        poblacion: "900k Hab | 650k LN",
+                        intencionVoto: {
+                            labels: ["Morena (58%)", "PAN/PRI (20%)", "MC (10%)", "Otros (12%)"],
+                            data: [58, 20, 10, 12],
+                            colors: ["#6a1b31", "#1565c0", "#ff9800", "#64748b"]
+                        },
+                        lider: { nombre: "Ana Paty Peralta", partido: "Morena", color: "#6a1b31" }
+                    },
+                    {
+                        name: "Playa del Carmen (Solidaridad)",
+                        poblacion: "330k Hab | 240k LN",
+                        intencionVoto: {
+                            labels: ["PAN/PRI (46%)", "Morena (40%)", "MC (8%)", "Otros (6%)"],
+                            data: [46, 40, 8, 6],
+                            colors: ["#1565c0", "#6a1b31", "#ff9800", "#64748b"]
+                        },
+                        lider: { nombre: "Lili Campos", partido: "PAN/PRI", color: "#1565c0" }
+                    },
+                    {
+                        name: "Chetumal (Othón P. Blanco)",
+                        poblacion: "240k Hab | 180k LN",
+                        intencionVoto: {
+                            labels: ["Morena (48%)", "MC (20%)", "PAN/PRI (20%)", "Otros (12%)"],
+                            data: [48, 20, 20, 12],
+                            colors: ["#6a1b31", "#ff9800", "#1565c0", "#64748b"]
+                        },
+                        lider: { nombre: "Yensunni Martínez", partido: "Morena", color: "#6a1b31" }
+                    },
+                    {
+                        name: "Cozumel",
+                        poblacion: "90k Hab | 70k LN",
+                        intencionVoto: {
+                            labels: ["Morena (45%)", "PRI/PAN (40%)", "MC (8%)", "Otros (7%)"],
+                            data: [45, 40, 8, 7],
+                            colors: ["#6a1b31", "#e53935", "#ff9800", "#64748b"]
+                        },
+                        lider: { nombre: "Juanita Alonso", partido: "Morena", color: "#6a1b31" }
+                    }
+                ]
+            },
+            "sanl-potosi": {
+                name: "San Luis Potosí",
+                gov: "Ricardo Gallardo (PVEM)",
+                ln: "2.8 Millones",
+                prefLeader: "PVEM/Morena (42%)",
+                comp: "Alta",
+                aspirantes: [
+                    { name: "Ruth González", role: "Senadora", party: "PVEM", color: "#4caf50", initials: "RG" },
+                    { name: "Xavier Nava", role: "Ex-Alcalde", party: "PAN", color: "#1565c0", initials: "XN" }
+                ],
+                scenarios: {
+                    a: { label: "Escenario A: Ruth vs Nava", labels: ['Ruth González (40%)', 'Xavier Nava (35%)', 'MC (10%)', 'Indecisos (15%)'], data: [40, 35, 10, 15], colors: ['#4caf50', '#1565c0', '#ff9800', '#64748b'] },
+                    b: { label: "Escenario B: Alternativo", labels: ['PVEM/Morena (38%)', 'PAN (38%)', 'MC (12%)', 'Indecisos (12%)'], data: [38, 38, 12, 12], colors: ['#4caf50', '#1565c0', '#ff9800', '#64748b'] }
+                },
+                interna: { title: "Interna PVEM", labels: ["Ruth González", "Otros"], data: [70, 30], colors: ['#4caf50', '#64748b'] },
+                notes: [{ title: "Efecto Gallardo", text: "Ricardo Gallardo tiene fuerte control del PVEM estatal." }],
+                municipios: [{ name: "SLP (Cap)", party: "PVEM", candidate: "Grupo Gallardo", lead: "+8%", color: "#4caf50" }],
+                municipiosDetallados: [
+                    {
+                        name: "San Luis Potosí (Capital)",
+                        poblacion: "900k Hab | 650k LN",
+                        intencionVoto: {
+                            labels: ["PVEM/Morena (45%)", "PAN/PRI (35%)", "MC (10%)", "Otros (10%)"],
+                            data: [45, 35, 10, 10],
+                            colors: ["#4caf50", "#1565c0", "#ff9800", "#64748b"]
+                        },
+                        lider: { nombre: "Enrique Galindo", partido: "PRI/PAN", color: "#1565c0" }
+                    },
+                    {
+                        name: "Soledad de G. Sánchez",
+                        poblacion: "350k Hab | 250k LN",
+                        intencionVoto: {
+                            labels: ["PVEM (60%)", "Morena (15%)", "PAN/PRI (15%)", "Otros (10%)"],
+                            data: [60, 15, 15, 10],
+                            colors: ["#4caf50", "#6a1b31", "#1565c0", "#64748b"]
+                        },
+                        lider: { nombre: "Grupo Gallardo", partido: "PVEM", color: "#4caf50" }
+                    },
+                    {
+                        name: "Ciudad Valles",
+                        poblacion: "180k Hab | 130k LN",
+                        intencionVoto: {
+                            labels: ["PVEM/Morena (48%)", "PAN/PRI (30%)", "MC (12%)", "Otros (10%)"],
+                            data: [48, 30, 12, 10],
+                            colors: ["#4caf50", "#1565c0", "#ff9800", "#64748b"]
+                        },
+                        lider: { nombre: "David Medina", partido: "PVEM", color: "#4caf50" }
+                    }
+                ]
+            },
+            "sinaloa": {
+                name: "Sinaloa",
+                gov: "Rubén Rocha (Morena)",
+                ln: "3.0 Millones",
+                prefLeader: "Morena (50%)",
+                comp: "Baja",
+                aspirantes: [
+                    { name: "Graciela Domínguez", role: "Senadora", party: "Morena", color: "#6a1b31", initials: "GD" },
+                    { name: "Sergio Torres", role: "Senador", party: "PAN", color: "#1565c0", initials: "ST" }
+                ],
+                scenarios: {
+                    a: { label: "Escenario A: Graciela vs Torres", labels: ['Graciela Domínguez (48%)', 'Sergio Torres (28%)', 'MC (10%)', 'Indecisos (14%)'], data: [48, 28, 10, 14], colors: ['#6a1b31', '#1565c0', '#ff9800', '#64748b'] },
+                    b: { label: "Escenario B: Alternativo", labels: ['Morena (46%)', 'PAN (30%)', 'MC (12%)', 'Indecisos (12%)'], data: [46, 30, 12, 12], colors: ['#6a1b31', '#1565c0', '#ff9800', '#64748b'] }
+                },
+                interna: { title: "Interna Morena", labels: ["Graciela Domínguez", "Otros"], data: [65, 35], colors: ['#6a1b31', '#64748b'] },
+                notes: [{ title: "Dominio Morena", text: "Sinaloa es bastión consolidado de Morena." }],
+                municipios: [{ name: "Culiacán", party: "Morena", candidate: "Grupo Rocha", lead: "+20%", color: "#6a1b31" }],
+                municipiosDetallados: [
+                    {
+                        name: "Culiacán (Capital)",
+                        poblacion: "1.0M Hab | 750k LN",
+                        intencionVoto: {
+                            labels: ["Morena (55%)", "PAN/PRI (25%)", "MC (10%)", "Otros (10%)"],
+                            data: [55, 25, 10, 10],
+                            colors: ["#6a1b31", "#1565c0", "#ff9800", "#64748b"]
+                        },
+                        lider: { nombre: "Juan de Dios Gámez", partido: "Morena", color: "#6a1b31" }
+                    },
+                    {
+                        name: "Mazatlán",
+                        poblacion: "500k Hab | 380k LN",
+                        intencionVoto: {
+                            labels: ["Morena (50%)", "PAN/PRI (30%)", "MC (10%)", "Otros (10%)"],
+                            data: [50, 30, 10, 10],
+                            colors: ["#6a1b31", "#1565c0", "#ff9800", "#64748b"]
+                        },
+                        lider: { nombre: "Estrella Palacios", partido: "Morena", color: "#6a1b31" }
+                    },
+                    {
+                        name: "Ahome (Los Mochis)",
+                        poblacion: "460k Hab | 320k LN",
+                        intencionVoto: {
+                            labels: ["Morena (58%)", "PAN/PRI (20%)", "MC (12%)", "Otros (10%)"],
+                            data: [58, 20, 12, 10],
+                            colors: ["#6a1b31", "#1565c0", "#ff9800", "#64748b"]
+                        },
+                        lider: { nombre: "Gerardo Vargas", partido: "Morena", color: "#6a1b31" }
+                    }
+                ]
+            },
+            "tlaxcala": {
+                name: "Tlaxcala",
+                gov: "Lorena Cuéllar (Morena)",
+                ln: "1.3 Millones",
+                prefLeader: "Morena (48%)",
+                comp: "Media",
+                aspirantes: [
+                    { name: "Anabell Ávalos", role: "Ex-Alcaldesa", party: "PAN", color: "#1565c0", initials: "AA" },
+                    { name: "Sandra Corona", role: "Diputada", party: "Morena", color: "#6a1b31", initials: "SC" }
+                ],
+                scenarios: {
+                    a: { label: "Escenario A: Sandra vs Anabell", labels: ['Sandra Corona (45%)', 'Anabell Ávalos (32%)', 'MC (10%)', 'Indecisos (13%)'], data: [45, 32, 10, 13], colors: ['#6a1b31', '#1565c0', '#ff9800', '#64748b'] },
+                    b: { label: "Escenario B: Alternativo", labels: ['Morena (43%)', 'PAN (35%)', 'MC (12%)', 'Indecisos (10%)'], data: [43, 35, 12, 10], colors: ['#6a1b31', '#1565c0', '#ff9800', '#64748b'] }
+                },
+                interna: { title: "Interna Morena", labels: ["Sandra Corona", "Otros"], data: [55, 45], colors: ['#6a1b31', '#64748b'] },
+                notes: [{ title: "Estado Pequeño", text: "Tlaxcala es el estado más pequeño de México." }],
+                municipios: [{ name: "Tlaxcala (Cap)", party: "Morena", candidate: "Grupo Lorena", lead: "+12%", color: "#6a1b31" }],
+                municipiosDetallados: [
+                    {
+                        name: "Tlaxcala (Capital)",
+                        poblacion: "100k Hab | 80k LN",
+                        intencionVoto: {
+                            labels: ["Morena (45%)", "PAN/PRI (35%)", "MC (10%)", "Otros (10%)"],
+                            data: [45, 35, 10, 10],
+                            colors: ["#6a1b31", "#1565c0", "#ff9800", "#64748b"]
+                        },
+                        lider: { nombre: "Alfonso Sánchez", partido: "Morena", color: "#6a1b31" }
+                    },
+                    {
+                        name: "Apizaco",
+                        poblacion: "80k Hab | 60k LN",
+                        intencionVoto: {
+                            labels: ["PAN/PRI (42%)", "Morena (38%)", "MC (10%)", "Otros (10%)"],
+                            data: [42, 38, 10, 10],
+                            colors: ["#1565c0", "#6a1b31", "#ff9800", "#64748b"]
+                        },
+                        lider: { nombre: "Pablo Badillo", partido: "PAN", color: "#1565c0" }
+                    }
+                ]
+            },
+            "zacatecas": {
+                name: "Zacatecas",
+                gov: "David Monreal (Morena)",
+                ln: "1.6 Millones",
+                prefLeader: "Morena (52%)",
+                comp: "Baja",
+                aspirantes: [
+                    { name: "Claudia Anaya", role: "Senadora", party: "Morena", color: "#6a1b31", initials: "CA" },
+                    { name: "Miguel Torres", role: "Diputado", party: "PAN", color: "#1565c0", initials: "MT" }
+                ],
+                scenarios: {
+                    a: { label: "Escenario A: Claudia vs Miguel", labels: ['Claudia Anaya (50%)', 'Miguel Torres (25%)', 'MC (10%)', 'Indecisos (15%)'], data: [50, 25, 10, 15], colors: ['#6a1b31', '#1565c0', '#ff9800', '#64748b'] },
+                    b: { label: "Escenario B: Alternativo", labels: ['Morena (48%)', 'PAN (28%)', 'MC (12%)', 'Indecisos (12%)'], data: [48, 28, 12, 12], colors: ['#6a1b31', '#1565c0', '#ff9800', '#64748b'] }
+                },
+                interna: { title: "Interna Morena", labels: ["Claudia Anaya", "Otros"], data: [70, 30], colors: ['#6a1b31', '#64748b'] },
+                notes: [{ title: "Efecto Monreal", text: "La familia Monreal tiene fuerte influencia en el estado." }],
+                municipios: [{ name: "Zacatecas (Cap)", party: "Morena", candidate: "Grupo Monreal", lead: "+22%", color: "#6a1b31" }],
+                municipiosDetallados: [
+                    {
+                        name: "Zacatecas (Capital)",
+                        poblacion: "140k Hab | 110k LN",
+                        intencionVoto: {
+                            labels: ["Morena (50%)", "PAN/PRI (30%)", "MC (10%)", "Otros (10%)"],
+                            data: [50, 30, 10, 10],
+                            colors: ["#6a1b31", "#1565c0", "#ff9800", "#64748b"]
+                        },
+                        lider: { nombre: "Jorge Miranda", partido: "Morena/PVEM", color: "#6a1b31" }
+                    },
+                    {
+                        name: "Fresnillo",
+                        poblacion: "240k Hab | 160k LN",
+                        intencionVoto: {
+                            labels: ["Morena (60%)", "PAN/PRI (25%)", "MC (8%)", "Otros (7%)"],
+                            data: [60, 25, 8, 7],
+                            colors: ["#6a1b31", "#1565c0", "#ff9800", "#64748b"]
+                        },
+                        lider: { nombre: "Saúl Monreal", partido: "Morena", color: "#6a1b31" }
+                    },
+                    {
+                        name: "Guadalupe",
+                        poblacion: "200k Hab | 140k LN",
+                        intencionVoto: {
+                            labels: ["Morena (55%)", "PAN/PRI (25%)", "MC (12%)", "Otros (8%)"],
+                            data: [55, 25, 12, 8],
+                            colors: ["#6a1b31", "#1565c0", "#ff9800", "#64748b"]
+                        },
+                        lider: { nombre: "Pepe Saldívar", partido: "Morena", color: "#6a1b31" }
+                    }
+                ]
+            }
+        };
+
+        let muniCoalition = 'indep';
+
+        // ============================
+        // LOAD LOGIC
+        // ============================
+        const urlParams = new URLSearchParams(window.location.search);
+        let currentId = urlParams.get('id') || 'sonora';
+        if (!DATA_STATES[currentId]) currentId = 'sonora'; // fallback
+
+        const STATE = DATA_STATES[currentId];
+
+        // 1. POPULATE HEADER & STATS
+        document.title = `${STATE.name} 2027 – Detalle`;
+        document.querySelector('h1').innerHTML = `${STATE.name} <span style="font-weight:400; color:var(--muted); font-size:0.7em;">Elección 2027</span>`;
+
+        const statVals = document.querySelectorAll('.stat-val');
+        if (statVals.length >= 3) {
+            statVals[0].innerText = STATE.ln;
+            statVals[1].innerText = STATE.prefLeader;
+            statVals[2].innerText = STATE.comp;
+        }
+
+        const govDiv = document.querySelector('header div[style="text-align:right"] div:nth-child(2)');
+        if (govDiv) govDiv.innerText = STATE.gov;
+
+        // 2. POPULATE CANDIDATES
+        const candGrid = document.querySelector('.cand-grid');
+        candGrid.innerHTML = ""; // clear hardcoded
+        STATE.aspirantes.forEach(cand => {
+            const card = document.createElement('div');
+            card.className = 'candidate-card';
+            card.innerHTML = `
+                <div class="avatar" style="background:${cand.color};">
+                    <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:bold;">${cand.initials}</div>
+                </div>
+                <div class="cand-info">
+                    <h3>${cand.name}</h3>
+                    <div class="cand-role">${cand.role}</div>
+                    <span class="cand-badge" style="border:1px solid ${cand.color}; color:${cand.color}aa">${cand.party}</span>
+                </div>
+            `;
+            candGrid.appendChild(card);
+        });
+
+        // 3. POPULATE MUNICIPALITIES
+        renderMunicipalCharts();
+
+        // 4. POPULATE DROPDOWN
+        const sel = document.getElementById("selScenario");
+        sel.innerHTML = "";
+        const optA = document.createElement("option"); optA.value = "a"; optA.innerText = STATE.scenarios.a.label;
+        const optB = document.createElement("option"); optB.value = "b"; optB.innerText = STATE.scenarios.b.label;
+        sel.appendChild(optA);
+        sel.appendChild(optB);
+
+        // 5. POPULATE NOTES
+        const notesContainer = document.querySelector('.notes-box .note-item').parentElement;
+        const h4Notes = notesContainer.querySelector('h4');
+        notesContainer.innerHTML = "";
+        notesContainer.appendChild(h4Notes);
+        STATE.notes.forEach(note => {
+            const div = document.createElement('div');
+            div.className = 'note-item';
+            div.innerHTML = `<strong style="color:#fff">${note.title}:</strong> ${note.text}`;
+            notesContainer.appendChild(div);
+        });
+
+        // INTERNA TITLE
+        const internaH4 = document.querySelectorAll('.notes-box h4')[0];
+        if (internaH4) internaH4.innerText = `${STATE.interna.title} (Preferencia)`;
+
+        // ============================
+        // CHART RENDERING
+        // ============================
+
+        let chartCareoCtx = document.getElementById('chartCareo').getContext('2d');
+        let chartCareo = new Chart(chartCareoCtx, {
+            type: 'bar',
+            data: {
+                labels: STATE.scenarios.a.labels,
+                datasets: [
+                    {
+                        label: 'Base',
+                        data: STATE.scenarios.a.data,
+                        backgroundColor: STATE.scenarios.a.colors,
+                        borderRadius: 4,
+                        barPercentage: 0.6,
+                        stack: 'stack0'
+                    },
+                    {
+                        label: 'MC/Alianza',
+                        data: [0, 0, 0, 0], // Start empty
+                        backgroundColor: '#ff9800',
+                        borderRadius: 4,
+                        barPercentage: 0.6,
+                        stack: 'stack0'
+                    }
+                ]
+            },
+            options: {
+                layout: { padding: { left: 180 } },
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    datalabels: {
+                        color: '#fff',
+                        anchor: 'center',
+                        align: 'center',
+                        formatter: (v, ctx) => {
+                            // Only show label if > 0 and it's the total or significant
+                            if (v < 2) return '';
+                            return v + '%';
+                        },
+                        font: { weight: 'bold', size: 10 }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                return context.dataset.label + ': ' + context.raw + '%';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: { display: false, max: 70, stacked: true },
+                    y: { grid: { display: false }, stacked: true, ticks: { color: '#fff', font: { size: 11 } } }
+                }
+            }
+        });
+
+        // MC Strategy Controller
+        function setMcCoalition(mode) {
+            mcCoalition = mode;
+            const knob = document.getElementById('mc_knob');
+            const optOf = document.getElementById('mc_opt_oficial');
+            const optOp = document.getElementById('mc_opt_oposicion');
+
+            if (mode === 'oficialismo') {
+                knob.style.transform = 'translateX(-30px)';
+                knob.style.background = '#e57373';
+                knob.innerHTML = 'MC<br><span style="font-size:6px; opacity:0.9;">ALIADO</span>';
+                optOf.style.opacity = '1';
+                optOp.style.opacity = '0.3';
+            } else if (mode === 'oposicion') {
+                knob.style.transform = 'translateX(30px)';
+                knob.style.background = '#64b5f6';
+                knob.innerHTML = 'MC<br><span style="font-size:6px; opacity:0.9;">ALIADO</span>';
+                optOf.style.opacity = '0.3';
+                optOp.style.opacity = '1';
+            } else {
+                knob.style.transform = 'translateX(0)';
+                knob.style.background = '#ff9800';
+                knob.innerHTML = 'MC<br><span style="font-size:6px; opacity:0.8;">SOLO</span>';
+                optOf.style.opacity = '0.6';
+                optOp.style.opacity = '0.6';
+            }
+            updateCareo();
+        }
+
+        let migrantEffectEnabled = false;
+
+        function updateCareo() {
+            const mode = document.getElementById("selScenario").value;
+            const d = STATE.scenarios[mode];
+            const totalBaseVotes = MIGRANT_CONFIG.baseVotes || 1000000;
+
+            // DYNAMIC INDEX MAPPING based on Colors (fixes order issues in states like Aguascalientes)
+            // Default mapping if colors not found
+            let idxMorena = 0;
+            let idxPan = 1;
+            let idxMc = 2;
+
+            // Try to find by color
+            if (d.colors) {
+                const im = d.colors.indexOf('#6a1b31');
+                const ip = d.colors.indexOf('#1565c0');
+                const imc = d.colors.indexOf('#ff9800');
+                if (im !== -1) idxMorena = im;
+                if (ip !== -1) idxPan = ip;
+                if (imc !== -1) idxMc = imc;
+            }
+
+            // 1. Calculate Base Absolute Votes (Scenario Data)
+            let baseVotesAbs = d.data.map(pct => (pct / 100) * totalBaseVotes);
+
+            // 2. Apply MC Coalition Logic to Base Votes
+            // Transfer MC votes to Morena or PAN if applicable
+            let addedFromMC = [0, 0, 0, 0];
+            if (mcCoalition === 'oficialismo') {
+                const mcTransfer = baseVotesAbs[idxMc];
+                baseVotesAbs[idxMc] = 0;
+                baseVotesAbs[idxMorena] += mcTransfer;
+                addedFromMC[idxMorena] = mcTransfer;
+            } else if (mcCoalition === 'oposicion') {
+                const mcTransfer = baseVotesAbs[idxMc];
+                baseVotesAbs[idxMc] = 0;
+                baseVotesAbs[idxPan] += mcTransfer;
+                addedFromMC[idxPan] = mcTransfer;
+            }
+
+            // 3. Calculate Migrant Votes Distribution
+            let migrantVotesAbs = [0, 0, 0, 0];
+            // Initialize array same length as data to be safe, though 4 is usually enough
+            migrantVotesAbs = new Array(d.data.length).fill(0);
+
+            if (migrantEffectEnabled && migrantVotes > 0) {
+                if (migrantParty === 'oficialismo') {
+                    migrantVotesAbs[idxMorena] = migrantVotes;
+                } else if (migrantParty === 'oposicion') {
+                    migrantVotesAbs[idxPan] = migrantVotes;
+                } else if (migrantParty === 'mc') {
+                    // If MC is independent, it goes to MC idx. If coalition, goes to partner.
+                    if (mcCoalition === 'independiente') migrantVotesAbs[idxMc] = migrantVotes;
+                    else if (mcCoalition === 'oficialismo') migrantVotesAbs[idxMorena] = migrantVotes;
+                    else if (mcCoalition === 'oposicion') migrantVotesAbs[idxPan] = migrantVotes;
+                } else { // Dividido
+                    // Split 33/33/34
+                    migrantVotesAbs[idxMorena] = migrantVotes * 0.33;
+                    migrantVotesAbs[idxPan] = migrantVotes * 0.33;
+
+                    if (mcCoalition === 'independiente') migrantVotesAbs[idxMc] = migrantVotes * 0.34;
+                    else if (mcCoalition === 'oficialismo') migrantVotesAbs[idxMorena] += migrantVotes * 0.34;
+                    else if (mcCoalition === 'oposicion') migrantVotesAbs[idxPan] += migrantVotes * 0.34;
+                }
+            }
+
+            // 4. Calculate Grand Total
+            const grandTotal = baseVotesAbs.reduce((a, b) => a + b, 0) + migrantVotesAbs.reduce((a, b) => a + b, 0);
+
+            // 5. Convert to Percentages for Chart Stacks
+            const dsBasePct = baseVotesAbs.map(v => Number(((v / grandTotal) * 100).toFixed(1)));
+            const dsMigrantPct = migrantVotesAbs.map(v => Number(((v / grandTotal) * 100).toFixed(1)));
+
+            // Calculate Total Pct for Labels
+            const totalPct = dsBasePct.map((base, i) => Number((base + dsMigrantPct[i]).toFixed(1)));
+            const finalLabels = generateAdjustedLabels(d.labels, totalPct);
+
+            // 6. Update Chart
+            chartCareo.data.labels = finalLabels;
+
+            // Dataset 0: Base
+            chartCareo.data.datasets[0].label = 'Base / Coalición';
+            chartCareo.data.datasets[0].data = dsBasePct;
+            chartCareo.data.datasets[0].backgroundColor = (ctx) => {
+                // Logic to show Alliance color if MC joined
+                if (mcCoalition === 'oficialismo' && ctx.dataIndex === idxMorena) return '#6a1b31';
+                if (mcCoalition === 'oposicion' && ctx.dataIndex === idxPan) return '#1565c0';
+                return d.colors[ctx.dataIndex];
+            };
+
+            // Dataset 1: Migrantes
+            chartCareo.data.datasets[1].label = 'Voto Migrante';
+            chartCareo.data.datasets[1].data = dsMigrantPct;
+            chartCareo.data.datasets[1].backgroundColor = '#AB47BC'; // Purple for Migrants
+            chartCareo.data.datasets[1].borderRadius = 4;
+
+            chartCareo.update();
+
+            // Update Badge
+            const badge = document.getElementById('migrantEffectBadge');
+            if (migrantEffectEnabled && migrantVotes > 0) {
+                badge.style.display = 'block';
+                badge.innerText = `Incluye ${migrantVotes.toLocaleString('es-MX')} votos migrantes`;
+            } else if (mcCoalition !== 'independiente') {
+                badge.style.display = 'block';
+                badge.innerText = `Simulación: MC se une a ${mcCoalition === 'oficialismo' ? 'Morena' : 'PAN+'}`;
+            } else {
+                badge.style.display = 'none';
+            }
+
+            // --- UPDATE RELIABILITY BADGE (Individual per State) ---
+            const relBadge = document.getElementById('reliabilityBadge');
+            if (relBadge) {
+                // Simulate specialized calculation based on State LN size
+                // Larger LN -> Higher Confidence (usually)
+                let baseConf = 97.0;
+                // Simple hash of state name to keep it consistent but different per state
+                const hash = STATE.name.length + STATE.ln.length;
+                const variance = (hash % 5) * 0.2; // 0 to 0.8
+                const finalConf = (baseConf + variance).toFixed(1);
+                relBadge.innerText = `MARGEN DE CONFIABILIDAD: ${finalConf}%`;
+            }
+        }
+
+        // Helper not needed strictly anymore inside updateCareo, but keeping signature if used elsewhere or removing.
+        function calculateMigrantAdjustedData(baseData) { return baseData; } // Deprecated wrapper if needed execution flow
+
+
+        function generateAdjustedLabels(baseLabels, newData) {
+            // Update labels with new percentages
+            return baseLabels.map((label, i) => {
+                const namePart = label.split('(')[0].trim();
+                return `${namePart} (${newData[i]}%)`;
+            });
+        }
+
+        function toggleMigrantEffect() {
+            const toggle = document.getElementById('migrantToggle');
+            const knob = document.getElementById('toggleKnob');
+            const container = toggle.closest('div');
+
+            migrantEffectEnabled = toggle.checked;
+
+            if (migrantEffectEnabled) {
+                knob.style.left = '19px';
+                knob.style.backgroundColor = '#CE93D8';
+                container.querySelector('span:first-of-type').style.backgroundColor = '#7B1FA2';
+            } else {
+                knob.style.left = '3px';
+                knob.style.backgroundColor = '#fff';
+                container.querySelector('span:first-of-type').style.backgroundColor = '#444';
+            }
+
+            updateCareo();
+        }
+
+        let chartInternaCtx = document.getElementById('chartInterna').getContext('2d');
+        new Chart(chartInternaCtx, {
+            type: 'doughnut',
+            data: {
+                labels: STATE.interna.labels,
+                datasets: [{
+                    data: STATE.interna.data,
+                    backgroundColor: STATE.interna.colors,
+                    borderWidth: 0,
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '60%',
+                plugins: {
+                    legend: { display: true, position: 'right', labels: { color: '#e9eefc', boxWidth: 10, font: { size: 10 } } },
+                    datalabels: { color: '#fff', formatter: v => v + '%', font: { weight: 'bold' } }
+                }
+            }
+        });
+
+
+
+        // ============================
+        // MIGRANT VOTE SIMULATOR (SONORA ONLY)
+        // ============================
+        // ============================
+        // MIGRANT VOTE SIMULATOR (DYNAMIC FOR ALL STATES)
+        // ============================
+
+        // Helper to parse LN format "2.4 Millones" -> 2400000
+        function parseLN(lnStr) {
+            const num = parseFloat(lnStr.split(' ')[0]);
+            return Math.round(num * 1000000);
+        }
+
+        const lnValue = parseLN(STATE.ln);
+
+        // Estimate Migrant Population Factor based on State Tradition
+        // Zacatecas/Mich/Guerrero have very high migration. Border states high.
+        let migFactor = 0.15; // Base default (15%)
+        const highMigStates = ['zacatecas', 'michoacan', 'guerrero', 'guanajuato', 'oaxaca'];
+        const medMigStates = ['sonora', 'chihuahua', 'bajacalifornia', 'sanl-potosi', 'durango', 'hidalgo'];
+
+        if (highMigStates.includes(currentId)) migFactor = 0.35;
+        else if (medMigStates.includes(currentId)) migFactor = 0.25;
+
+        // Use user provided Sonora data exactly if Sonora
+        let totalMigrantsEst = Math.round(lnValue * migFactor);
+        if (currentId === 'sonora') totalMigrantsEst = 802000;
+
+        // Get Base Probabilities from Scenario A
+        const sData = STATE.scenarios.a.data;
+        // Assumes order: [Morena, PAN, MC, Indec] (standardized in data)
+        // Verify index 0 is Morena/Oficial? 
+        // Most states follow: 0=Morena/Oficial, 1=PAN/Opo, 2=MC.
+        // We will assume this standard. 
+
+        const MIGRANT_CONFIG = {
+            totalMigrants: totalMigrantsEst,
+            baseVotes: lnValue,
+            baseMorena: sData[0],
+            basePAN: sData[1],
+            baseMC: sData[2] || 5, // fallback
+            baseOtros: sData[3] || 15
+        };
+
+        // Initialize Variables
+        let migrantParty = 'dividido';
+        let migrantVotes = 0;
+        let mcCoalition = 'independiente';
+
+        // Simulator enabled via checkbox
+        // document.getElementById('migrantSection').style.display = 'block';
+
+        // Update Slider Max/Default
+        const slider = document.getElementById('migrantSlider');
+        // Set max to 50% of total migrants? or 100%? Let's say we simulate up to 200k participation usually
+        // Let's make slider range dynamic but cap at reasonable participation (e.g. 10-20% turnout of migrants)
+        // Migrant turnout is usually low. 
+        const maxSimVotes = MIGRANT_CONFIG.totalMigrants; // Allow simulating up to 100% of migrants
+        slider.max = maxSimVotes;
+
+        // Ensure starting value is reasonable (e.g. 0)
+        // If current migrantVotes is higher than new max (unlikely if creating fresh), clamp it?
+        // But here we are initializing.
+        if (slider.value > maxSimVotes) slider.value = maxSimVotes;
+
+        // Use current value or default to 0
+        // slider.value = 0; // Keeping commented to preserve state if re-running? Actually this is init.
+
+
+        // Dynamic Slider Labels
+        const labelContainer = document.querySelector('#migrantSlider + div');
+        if (labelContainer) {
+            const spans = labelContainer.querySelectorAll('span');
+            if (spans.length === 5) {
+                const fmtK = n => (n >= 1000) ? (n / 1000).toFixed(0) + 'k' : n;
+                spans[0].innerText = '0';
+                spans[1].innerText = fmtK(maxSimVotes * 0.25);
+                spans[2].innerText = fmtK(maxSimVotes * 0.50);
+                spans[3].innerText = fmtK(maxSimVotes * 0.75);
+                spans[4].innerText = fmtK(maxSimVotes);
+            }
+        }
+
+        slider.addEventListener('input', function () {
+            migrantVotes = parseInt(this.value);
+            updateMigrantSimulation();
+        });
+
+        // Update Static Text in Simulator
+        const migTitle = document.querySelector('#migrantSection h2');
+        if (migTitle) migTitle.innerHTML = `🌎 Simulador: Voto Migrante <span style="color:#E1BEE7">(${STATE.name})</span>`;
+
+        const migSub = document.querySelector('#migrantSection p');
+        if (migSub) migSub.innerText = `Población Migrante Est: ${MIGRANT_CONFIG.totalMigrants.toLocaleString()} | LN: ${STATE.ln}`;
+
+        function toggleSimulatorVisibility() {
+            const section = document.getElementById('migrantSection');
+            const chk = document.getElementById('toggleSimSection');
+            if (chk.checked) section.style.display = 'block';
+            else section.style.display = 'none';
+        }
+
+        function setMigrantParty(party) {
+            migrantParty = party;
+
+            // Update button styles
+            const btns = ['btnOficialismo', 'btnOposicion', 'btnMC', 'btnDividido'];
+            btns.forEach(id => {
+                const btn = document.getElementById(id);
+                btn.style.transform = 'scale(1)';
+                btn.style.boxShadow = 'none';
+            });
+
+            // Highlight selected
+            const selectedId = party === 'oficialismo' ? 'btnOficialismo' :
+                party === 'oposicion' ? 'btnOposicion' :
+                    party === 'mc' ? 'btnMC' : 'btnDividido';
+            document.getElementById(selectedId).style.transform = 'scale(1.02)';
+            document.getElementById(selectedId).style.boxShadow = '0 0 15px rgba(156,39,176,0.5)';
+
+            updateMigrantSimulation();
+        }
+
+        function setMCCoalition(coalition) {
+            mcCoalition = coalition;
+
+            // Update button styles (if elements exist)
+            const mcBtns = ['btnMCIndep', 'btnMCMorena', 'btnMCPAN'];
+            mcBtns.forEach(id => {
+                const btn = document.getElementById(id);
+                if (btn) {
+                    btn.style.transform = 'scale(1)';
+                    btn.style.boxShadow = 'none';
+                    btn.style.borderWidth = '1px';
+                }
+            });
+
+            // Highlight selected
+            const selectedId = coalition === 'independiente' ? 'btnMCIndep' :
+                coalition === 'oficialismo' ? 'btnMCMorena' : 'btnMCPAN';
+            const selectedBtn = document.getElementById(selectedId);
+            if (selectedBtn) {
+                selectedBtn.style.transform = 'scale(1.02)';
+                selectedBtn.style.boxShadow = '0 0 12px rgba(255,152,0,0.5)';
+                selectedBtn.style.borderWidth = '2px';
+            }
+
+            // Show impact preview (Only relevant if Migrant Section is visible/Sonora)
+            const impactDiv = document.getElementById('mcCoalitionImpact');
+            const impactText = document.getElementById('mcImpactText');
+
+            if (impactDiv && impactText) {
+                if (coalition !== 'independiente') {
+                    impactDiv.style.display = 'block';
+                    const mcPct = MIGRANT_CONFIG.baseMC; // 12%
+                    const targetParty = coalition === 'oficialismo' ? 'Morena' : 'PAN+';
+                    const newTotal = coalition === 'oficialismo'
+                        ? MIGRANT_CONFIG.baseMorena + mcPct
+                        : MIGRANT_CONFIG.basePAN + mcPct;
+                    impactText.innerHTML = `MC (${mcPct}%) se suma a <span style="color:${coalition === 'oficialismo' ? '#ef9a9a' : '#90caf9'}">${targetParty}</span> → Total: <strong>${newTotal}%</strong>`;
+                } else {
+                    impactDiv.style.display = 'none';
+                }
+            }
+
+            // Update simulations
+            updateMigrantSimulation();
+
+            // ALWAYS update the main chart
+            updateCareo();
+        }
+
+        function updateMigrantSimulation() {
+            // Update display
+            const formattedVotes = migrantVotes.toLocaleString('es-MX');
+            document.getElementById('sliderValue').innerText = formattedVotes + ' votos';
+            document.getElementById('migrantVotesDisplay').innerText = formattedVotes;
+
+            // Calculate new percentages
+            const totalNewVotes = MIGRANT_CONFIG.baseVotes + migrantVotes;
+
+            let migrantMorena = 0;
+            let migrantPAN = 0;
+
+            if (migrantParty === 'oficialismo') {
+                migrantMorena = migrantVotes;
+            } else if (migrantParty === 'oposicion') {
+                migrantPAN = migrantVotes;
+            } else if (migrantParty === 'mc') {
+                // MC gets all migrant votes - handled below
+            } else { // dividido (33/33/34)
+                migrantMorena = migrantVotes * 0.33;
+                migrantPAN = migrantVotes * 0.33;
+            }
+
+            // Original absolute votes
+            let baseMorenaVotes = (MIGRANT_CONFIG.baseMorena / 100) * MIGRANT_CONFIG.baseVotes;
+            let basePANVotes = (MIGRANT_CONFIG.basePAN / 100) * MIGRANT_CONFIG.baseVotes;
+            let baseMCVotesCalc = (MIGRANT_CONFIG.baseMC / 100) * MIGRANT_CONFIG.baseVotes;
+
+            // Add migrant votes to MC
+            let migrantMC = 0;
+            if (migrantParty === 'mc') {
+                migrantMC = migrantVotes;
+            } else if (migrantParty === 'dividido') {
+                migrantMC = migrantVotes * 0.34;
+            }
+
+            // Apply MC Coalition effect
+            if (mcCoalition === 'oficialismo') {
+                baseMorenaVotes += baseMCVotesCalc;
+                baseMCVotesCalc = 0;
+            } else if (mcCoalition === 'oposicion') {
+                basePANVotes += baseMCVotesCalc;
+                baseMCVotesCalc = 0;
+            }
+
+            // New totals
+            const newMorenaVotes = baseMorenaVotes + migrantMorena;
+            const newPANVotes = basePANVotes + migrantPAN;
+            const newMCVotesCalc = baseMCVotesCalc + migrantMC;
+
+            // New percentages
+            const newMorenaPct = (newMorenaVotes / totalNewVotes) * 100;
+            const newPANPct = (newPANVotes / totalNewVotes) * 100;
+
+            // Calculate MC percentage
+            let newMCPct = (newMCVotesCalc / totalNewVotes) * 100;
+            if (mcCoalition !== 'independiente') {
+                newMCPct = 0; // MC in coalition, votes already transferred
+            }
+
+            // Update UI
+            document.getElementById('newMorena').innerText = newMorenaPct.toFixed(1) + '%';
+            document.getElementById('newPAN').innerText = newPANPct.toFixed(1) + '%';
+            document.getElementById('barNewMorena').style.width = newMorenaPct + '%';
+            document.getElementById('barNewPAN').style.width = newPANPct + '%';
+
+            // Update MC bars
+            document.getElementById('newMC').innerText = newMCPct.toFixed(1) + '%';
+            document.getElementById('barNewMC').style.width = newMCPct + '%';
+
+            // Update base MC display based on coalition
+            if (mcCoalition !== 'independiente') {
+                document.getElementById('barNewMC').style.background = '#666';
+                document.getElementById('newMC').style.color = '#888';
+            } else {
+                document.getElementById('barNewMC').style.background = '#ff9800';
+                document.getElementById('newMC').style.color = '#fff';
+            }
+
+            // Show difference indicator
+            const diffIndicator = document.getElementById('diffIndicator');
+            if (migrantVotes > 0) {
+                diffIndicator.style.display = 'block';
+                const baseDiff = MIGRANT_CONFIG.baseMorena - MIGRANT_CONFIG.basePAN; // 12%
+                const newDiff = newMorenaPct - newPANPct;
+                const diffChange = newDiff - baseDiff;
+
+                let diffText = '';
+                let diffColor = '#CE93D8';
+
+                if (diffChange > 0) {
+                    diffText = `Morena amplía ventaja en +${diffChange.toFixed(1)}%`;
+                    diffColor = '#ef9a9a';
+                } else if (diffChange < 0) {
+                    diffText = `PAN+ reduce brecha en ${Math.abs(diffChange).toFixed(1)}%`;
+                    diffColor = '#90caf9';
+                } else {
+                    diffText = 'Sin cambio en la brecha';
+                }
+
+                document.getElementById('diffValue').innerText = diffText;
+                document.getElementById('diffValue').style.color = diffColor;
+
+                // Show toggle in chart when there are migrant votes
+                document.getElementById('migrantToggleContainer').style.display = 'flex';
+            } else {
+                diffIndicator.style.display = 'none';
+                document.getElementById('migrantToggleContainer').style.display = 'none';
+                // Reset toggle if no votes
+                document.getElementById('migrantToggle').checked = false;
+                migrantEffectEnabled = false;
+                document.getElementById('migrantEffectBadge').style.display = 'none';
+            }
+
+            // Update Base Labels in Impact Chart (Dynamic)
+            const baseMorenaEl = document.getElementById('baseMorena');
+            const basePANEl = document.getElementById('basePAN');
+            const baseMCEl = document.getElementById('baseMC');
+
+            if (baseMorenaEl) baseMorenaEl.innerText = MIGRANT_CONFIG.baseMorena + '%';
+            if (basePANEl) basePANEl.innerText = MIGRANT_CONFIG.basePAN + '%';
+            if (baseMCEl) baseMCEl.innerText = MIGRANT_CONFIG.baseMC + '%';
+
+            // Also update bars width for base
+            const barBaseMorena = document.getElementById('barBaseMorena');
+            const barBasePAN = document.getElementById('barBasePAN');
+            const barBaseMC = document.getElementById('barBaseMC');
+
+            if (barBaseMorena) barBaseMorena.style.width = MIGRANT_CONFIG.baseMorena + '%';
+            if (barBasePAN) barBasePAN.style.width = MIGRANT_CONFIG.basePAN + '%';
+            if (barBaseMC) barBaseMC.style.width = MIGRANT_CONFIG.baseMC + '%';
+
+            // Update Main Chart reflected from Simulator
+            updateCareo();
+
+            // Update the main chart if toggle is enabled
+            if (migrantEffectEnabled) {
+                updateCareo();
+            }
+        }
+
+        // Initialize with default selection
+        if (currentId === 'sonora') {
+            setMigrantParty('dividido');
+            setMCCoalition('independiente');
+        }
+
+        // ============================
+        // MUNICIPALITY CHARTS LOGIC
+        // ============================
+
+
+        function setMuniCoalition(val) {
+            muniCoalition = val;
+
+            // Trigger Global Simulation (Main Chart)
+            // Map values: 'indep'->'independiente', 'oficialismo'->'oficialismo', 'oposicion'->'oposicion'
+            const globalVal = val === 'indep' ? 'independiente' : val;
+            setMCCoalition(globalVal);
+
+            // UI Updates
+            document.getElementById('muniArrowLeft').className = 'mc-control-arrow ' + (val === 'oficialismo' ? 'active-left' : '');
+            document.getElementById('muniArrowRight').className = 'mc-control-arrow ' + (val === 'oposicion' ? 'active-right' : '');
+
+            // Center Status
+            const statusEl = document.getElementById('muniMcStatus');
+            if (val === 'indep') statusEl.innerText = 'MC Solo';
+            else if (val === 'oficialismo') statusEl.innerText = '→ Morena';
+            else statusEl.innerText = '→ PAN+';
+
+            renderMunicipalCharts();
+        }
+
+        function renderMunicipalCharts() {
+            const grid = document.getElementById('muniGrid');
+            if (!grid || !STATE) return;
+            grid.innerHTML = "";
+
+            // Check for Detailed Data
+            const list = STATE.municipiosDetallados || [];
+
+            // Fallback to simple cards if no detailed data exists
+            if (list.length === 0 && STATE.municipios) {
+                STATE.municipios.forEach(m => {
+                    const mCard = document.createElement('div');
+                    mCard.style.cssText = "background:rgba(255,255,255,0.05); border-radius:8px; padding:10px; border-left:3px solid " + m.color;
+                    mCard.innerHTML = `
+                        <div style="font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:0.5px;">${m.name}</div>
+                        <div style="font-weight:bold; color:#fff; font-size:14px; margin:4px 0;">${m.party}</div>
+                        <div style="font-size:11px; color:#e0e0e0;">${m.candidate}</div>
+                        <div style="font-size:10px; color:${m.color}; margin-top:4px;">${m.lead}</div>
+                    `;
+                    grid.appendChild(mCard);
+                });
+                return;
+            }
+
+            // Render Detailed Charts
+            list.forEach(m => {
+                // Clone data to avoid mutations
+                let d = [...m.intencionVoto.data];
+                let originalD = [...m.intencionVoto.data];
+                let c = [...m.intencionVoto.colors];
+
+                let mcVotes = 0;
+                let beneficiaryIdx = -1;
+
+                // DYNAMIC INFRASTRUCTURE: Identify indices by color to allow valid simulation regardless of data order
+                // Morena (#6a1b31) or PVEM (#4caf50)
+                const morenaIdx = m.intencionVoto.colors.findIndex(c => c === '#6a1b31' || c === '#4caf50');
+                // PAN (#1565c0) or PRI (#e53935)
+                const allianceIdx = m.intencionVoto.colors.findIndex(c => c === '#1565c0' || c === '#e53935');
+                // MC (#ff9800)
+                const mcIdx = m.intencionVoto.colors.findIndex(c => c === '#ff9800');
+
+                // Apply Coalition Logic
+                if (muniCoalition !== 'indep' && mcIdx !== -1) {
+                    mcVotes = d[mcIdx];
+                    d[mcIdx] = 0; // MC consumes itself
+
+                    if (muniCoalition === 'oficialismo' && morenaIdx !== -1) {
+                        beneficiaryIdx = morenaIdx; // Morena/PVEM
+                        d[morenaIdx] += mcVotes;
+                    } else if (muniCoalition === 'oposicion' && allianceIdx !== -1) {
+                        beneficiaryIdx = allianceIdx; // PAN/PRI
+                        d[allianceIdx] += mcVotes;
+                    }
+                }
+
+                // Determine Leader
+                let candidates = [{ v: d[0], i: 0 }, { v: d[1], i: 1 }];
+                if (muniCoalition === 'indep') candidates.push({ v: d[2], i: 2 });
+
+                candidates.sort((a, b) => b.v - a.v);
+                const leader = candidates[0];
+                const runner = candidates[1];
+                const diff = (leader.v - runner.v).toFixed(1);
+
+                let rawLeaderLabel = m.intencionVoto.labels[leader.i] || "Morena";
+                let leaderName = rawLeaderLabel.split('(')[0].trim();
+
+                let leadColor = c[leader.i];
+
+                // Build Bars HTML
+                let barsHTML = "";
+                // Render order: descending value
+                const indicesToRender = [0, 1, 2, 3];
+                indicesToRender.sort((a, b) => d[b] - d[a]);
+
+                indicesToRender.forEach(idx => {
+                    if (d[idx] < 0.1) return; // Hide 0% bars
+
+                    let rawLabel = m.intencionVoto.labels[idx] || "Otro";
+                    let labelName = rawLabel.split('(')[0].trim();
+
+                    let barContent = '';
+
+                    // Stacked Bar Logic for Coalition Beneficiary
+                    if (idx === beneficiaryIdx && mcVotes > 0) {
+                        const baseVal = originalD[idx];
+                        const addedVal = mcVotes;
+                        barContent = `
+                            <div style="height:100%; width:${baseVal}%; background:${c[idx]}; border-top-left-radius:4px; border-bottom-left-radius:4px;"></div>
+                            <div style="height:100%; width:${addedVal}%; background:#ff9800; border-top-right-radius:4px; border-bottom-right-radius:4px; position:relative;" title="Voto MC: ${addedVal}%"></div>
+                        `;
+                    } else {
+                        barContent = `<div style="height:100%; width:${d[idx]}%; background:${c[idx]}; border-radius:4px; transition:width 0.5s ease;"></div>`;
+                    }
+
+                    barsHTML += `
+                        <div style="margin-bottom:8px;">
+                            <div style="display:flex; justify-content:space-between; font-size:11px; color:#ddd; margin-bottom:3px;">
+                                <span>${labelName}</span>
+                                <span style="font-weight:bold;">${d[idx]}%</span>
+                            </div>
+                            <div style="height:8px; background:rgba(255,255,255,0.1); border-radius:4px; overflow:hidden; display:flex;">
+                                ${barContent}
+                            </div>
+                        </div>
+                    `;
+                });
+
+                // Create Card
+                const card = document.createElement('div');
+                card.style.cssText = "background:rgba(255,255,255,0.03); padding:15px; border-radius:12px; border:1px solid var(--border);";
+                card.innerHTML = `
+                <div style="display:flex; justify-content:space-between; margin-bottom:12px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:8px;">
+                    <div>
+                        <div style="font-size:15px; font-weight:bold; color:#fff;">${m.name}</div>
+                        <div style="font-size:11px; color:var(--muted);">${m.poblacion}</div>
+                    </div>
+                    <div style="text-align:right;">
+                        <div style="font-size:9px; color:var(--muted); letter-spacing:1px; text-transform:uppercase;">LÍDER</div>
+                        <div style="color:${leadColor}; font-weight:bold;">${leaderName} +${diff}%</div>
+                    </div>
+                </div>
+                <div>${barsHTML}</div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+    </script>
+</body>
+
+</html>
