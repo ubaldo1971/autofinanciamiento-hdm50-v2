@@ -12,6 +12,7 @@ const PORT = process.env.PORT || 3000;
 const allowedOrigins = [
     'http://localhost:5173',
     'http://localhost:3000',
+    'http://localhost:4000', // Admin panel
     'https://raitecoop.org',
     'https://www.raitecoop.org',
     'http://raitecoop.org',
@@ -32,13 +33,21 @@ app.use(cors({
     credentials: true
 }));
 
-app.use(express.json());
+app.use(express.json({ limit: '50mb' })); // Increased for base64 images
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // Routes
 app.use('/api/users', require('./routes/users'));
 app.use('/api/governance', require('./routes/governance'));
 app.use('/api/dashboard', require('./routes/dashboard'));
+app.use('/api/admin', require('./routes/admin'));
+app.use('/api/ocr', require('./routes/ocr'));
+app.use('/api/commitments', require('./routes/commitments'));
+app.use('/api/settings', require('./routes/settings'));
+app.use('/api/decode-barcode', require('./routes/decode-barcode'));
+app.use('/api/ecosystem', require('./routes/ecosystem'));
+app.use('/api/config', require('./routes/config'));
+app.use('/api/cooperativas', require('./routes/cooperativas'));
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
@@ -50,13 +59,24 @@ app.get('/api/health', (req, res) => {
     });
 });
 
-// Root endpoint
-app.get('/', (req, res) => {
-    res.json({
-        message: 'RAITE Cooperative API',
-        version: '1.0.0',
-        docs: '/api/health'
-    });
+// Serve Static Files (Production)
+const clientDistPath = path.join(__dirname, '../../client/dist');
+const adminDistPath = path.join(__dirname, '../../admin/dist');
+
+// Serve Admin Panel
+app.use('/admin', express.static(adminDistPath));
+app.get(/^\/admin\/.*$/, (req, res) => {
+    res.sendFile(path.join(adminDistPath, 'index.html'));
+});
+
+// Serve Client App
+app.use(express.static(clientDistPath));
+app.get(/^.*$/, (req, res) => {
+    // Exclude API routes from catch-all
+    if (req.path.startsWith('/api')) {
+        return res.status(404).json({ message: 'API endpoint not found' });
+    }
+    res.sendFile(path.join(clientDistPath, 'index.html'));
 });
 
 app.listen(PORT, '0.0.0.0', () => {

@@ -292,10 +292,7 @@ export const Governance = () => {
 
     // Admin / File State
     const [showAdmin, setShowAdmin] = useState(false);
-    const [documents, setDocuments] = useState([
-        { id: 1, name: "Estatutos_Generales_2024.pdf", date: "01 Ene 2024", size: "2.4 MB" },
-        { id: 2, name: "Acta_Asamblea_Extraordinaria_Nov.pdf", date: "15 Nov 2024", size: "1.1 MB" }
-    ]);
+    const [documents, setDocuments] = useState([]);
 
     const handleVote = () => {
         setSubmitted(true);
@@ -337,59 +334,49 @@ export const Governance = () => {
             </div>
 
             <div className="bg-white p-4 rounded-xl shadow-sm mb-6">
-                <div className="flex justify-between items-center mb-4">
+                <div className="mb-4">
                     <h3 className="font-bold text-gray-800">Documentación Oficial</h3>
-                    <button
-                        onClick={() => setShowAdmin(!showAdmin)}
-                        className="text-xs text-coop-blue underline"
-                    >
-                        {showAdmin ? 'Cerrar Admin' : 'Admin'}
-                    </button>
                 </div>
 
                 <div className="space-y-3">
-                    {documents.map(doc => (
-                        <div key={doc.id} className="flex items-center justify-between p-3 border border-gray-100 rounded-lg hover:bg-gray-50 transition">
-                            <div className="flex items-center space-x-3">
-                                <div className="bg-red-50 p-2 rounded-lg text-red-500">
-                                    <FileText size={20} />
-                                </div>
-                                <div>
-                                    <p className="text-sm font-bold text-gray-700">{doc.name}</p>
-                                    <p className="text-[10px] text-gray-400">{doc.date} • {doc.size}</p>
-                                </div>
+                    {/* Estatutos Sociales PDF */}
+                    <a
+                        href="/docs/📜 ESTATUTOS SOCIALES.pdf"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center justify-between p-3 border border-gray-100 rounded-lg hover:bg-red-50 transition cursor-pointer group"
+                    >
+                        <div className="flex items-center space-x-3">
+                            <div className="bg-red-50 p-2 rounded-lg text-red-500 group-hover:bg-red-100">
+                                <FileText size={20} />
                             </div>
-                            <div className="flex items-center space-x-2">
-                                <button className="p-2 text-coop-blue hover:bg-blue-50 rounded-full" title="Ver PDF">
-                                    <FolderPlus size={18} />
-                                    <span className="text-xs font-bold sr-only">Ver</span>
-                                </button>
-                                {showAdmin && (
-                                    <button
-                                        onClick={() => handleDeleteDoc(doc.id)}
-                                        className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-full"
-                                    >
-                                        <Trash2 size={16} />
-                                    </button>
-                                )}
+                            <div>
+                                <p className="text-sm font-bold text-gray-700">📜 Estatutos Sociales</p>
+                                <p className="text-[10px] text-gray-400">Documento fundacional de la cooperativa</p>
                             </div>
                         </div>
-                    ))}
-                </div>
+                        <div className="text-xs text-coop-blue font-bold group-hover:text-red-500">Ver PDF →</div>
+                    </a>
 
-                {/* Admin Upload Zone */}
-                {showAdmin && (
-                    <div className="mt-4 border-t border-dashed border-gray-300 pt-4 animate-fade-in">
-                        <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-coop-blue border-dashed rounded-lg cursor-pointer bg-blue-50 hover:bg-blue-100 transition">
-                            <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                                <Upload className="w-8 h-8 mb-3 text-coop-blue" />
-                                <p className="text-sm text-gray-500"><span className="font-semibold">Click para subir</span> o arrastra</p>
-                                <p className="text-xs text-gray-400">PDF, DOCX (Max 10MB)</p>
+                    {/* Gobernanza de Cooperativa PDF */}
+                    <a
+                        href="/docs/gobernanza de cooperativa.pdf"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center justify-between p-3 border border-gray-100 rounded-lg hover:bg-blue-50 transition cursor-pointer group"
+                    >
+                        <div className="flex items-center space-x-3">
+                            <div className="bg-blue-50 p-2 rounded-lg text-blue-500 group-hover:bg-blue-100">
+                                <FileText size={20} />
                             </div>
-                            <input type="file" className="hidden" />
-                        </label>
-                    </div>
-                )}
+                            <div>
+                                <p className="text-sm font-bold text-gray-700">📋 Gobernanza de Cooperativa</p>
+                                <p className="text-[10px] text-gray-400">Estructura y reglas de gobierno</p>
+                            </div>
+                        </div>
+                        <div className="text-xs text-coop-blue font-bold group-hover:text-blue-600">Ver PDF →</div>
+                    </a>
+                </div>
             </div>
 
             {/* Voting Modal */}
@@ -561,12 +548,12 @@ export const Profile = () => {
         const fetchUser = async () => {
             try {
                 // Mock ID 1 for demo
-                const response = await fetch('http://localhost:3000/api/users/1');
+                const response = await fetch('/api/users/1');
                 if (response.ok) {
                     const data = await response.json();
                     setUser(data);
                     if (data.profile_image) {
-                        setProfileImage(data.profile_image.startsWith('http') ? data.profile_image : `http://localhost:3000${data.profile_image}`);
+                        setProfileImage(data.profile_image.startsWith('http') ? data.profile_image : data.profile_image);
                     }
                 }
             } catch (err) {
@@ -601,14 +588,14 @@ export const Profile = () => {
         formData.append('avatar', file);
 
         try {
-            const response = await fetch('http://localhost:3000/api/users/1/avatar', {
+            const response = await fetch('/api/users/1/avatar', {
                 method: 'POST',
                 body: formData
             });
 
             if (response.ok) {
                 const data = await response.json();
-                setProfileImage(`http://localhost:3000${data.avatarUrl}`);
+                setProfileImage(data.avatarUrl);
                 setIsCropping(false);
                 alert("Foto actualizada correctamente");
             }

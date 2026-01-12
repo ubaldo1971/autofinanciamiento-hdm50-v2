@@ -1994,7 +1994,7 @@
                     }
                 },
                 scales: {
-                    x: { display: false, max: 70, stacked: true },
+                    x: { display: false, max: 105, stacked: true },
                     y: { grid: { display: false }, stacked: true, ticks: { color: '#fff', font: { size: 11 } } }
                 }
             }
@@ -2100,8 +2100,10 @@
             const grandTotal = baseVotesAbs.reduce((a, b) => a + b, 0) + migrantVotesAbs.reduce((a, b) => a + b, 0);
 
             // 5. Convert to Percentages for Chart Stacks
-            const dsBasePct = baseVotesAbs.map(v => Number(((v / grandTotal) * 100).toFixed(1)));
-            const dsMigrantPct = migrantVotesAbs.map(v => Number(((v / grandTotal) * 100).toFixed(1)));
+            // 5. Convert to Percentages for Chart Stacks (Using BASE as denominator to avoid diluting original %)
+            // User Request: "no se le restan de otro lado a nadie" -> Base stays fixed, Migrants are additive.
+            const dsBasePct = baseVotesAbs.map(v => Number(((v / totalBaseVotes) * 100).toFixed(1)));
+            const dsMigrantPct = migrantVotesAbs.map(v => Number(((v / totalBaseVotes) * 100).toFixed(1)));
 
             // Calculate Total Pct for Labels
             const totalPct = dsBasePct.map((base, i) => Number((base + dsMigrantPct[i]).toFixed(1)));

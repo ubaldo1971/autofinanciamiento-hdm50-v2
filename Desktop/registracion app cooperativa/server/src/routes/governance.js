@@ -101,4 +101,87 @@ router.get('/stats', async (req, res) => {
     }
 });
 
+// ===== PROPOSALS API =====
+
+// Get all proposals
+router.get('/proposals', async (req, res) => {
+    try {
+        const proposals = db.getProposals();
+        res.json(proposals);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// Create new proposal
+router.post('/proposals', async (req, res) => {
+    try {
+        const { title, description, endDate, status } = req.body;
+        if (!title) {
+            return res.status(400).json({ message: 'Title is required' });
+        }
+        const proposal = db.createProposal({
+            title,
+            description: description || '',
+            endDate: endDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+            status: status || 'active'
+        });
+        res.json(proposal);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// Update proposal (status, votes, etc)
+router.put('/proposals/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const updates = req.body;
+        const proposal = db.updateProposal(id, updates);
+        if (!proposal) {
+            return res.status(404).json({ message: 'Proposal not found' });
+        }
+        res.json(proposal);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// Delete proposal
+router.delete('/proposals/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const deleted = db.deleteProposal(id);
+        if (!deleted) {
+            return res.status(404).json({ message: 'Proposal not found' });
+        }
+        res.json({ message: 'Proposal deleted' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// Vote on a proposal
+router.post('/proposals/:id/vote', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { voteType } = req.body; // 'favor' | 'contra' | 'abstencion'
+        if (!['favor', 'contra', 'abstencion'].includes(voteType)) {
+            return res.status(400).json({ message: 'Invalid vote type' });
+        }
+        const proposal = db.voteOnProposal(id, voteType);
+        if (!proposal) {
+            return res.status(404).json({ message: 'Proposal not found' });
+        }
+        res.json(proposal);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
 module.exports = router;

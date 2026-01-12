@@ -5,7 +5,7 @@
 // const API_BASE_URL = 'http://localhost:3000';
 
 // Production - Update this with your Render URL
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+const API_BASE_URL = import.meta.env.VITE_API_URL || '';
 
 export const API = {
     BASE_URL: API_BASE_URL,

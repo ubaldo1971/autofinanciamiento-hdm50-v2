@@ -306,31 +306,29 @@ const TokenWidget = ({ onOpenDetails, tokens, setTokens }) => {
 
                 {/* Compact Dividend Section */}
                 <div className="bg-white/5 rounded-lg p-2.5 backdrop-blur-sm">
-                    <div className="flex items-center justify-between mb-2">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2">
                         <div>
-                            <p className="text-blue-200 text-[10px] uppercase tracking-wide font-semibold">Dividendos Acumulados (Trimestral)</p>
+                            <p className="text-blue-200 text-[10px] uppercase tracking-wide font-semibold">Dividendos Acumulados</p>
                             <p className="text-lg font-bold text-green-300">${dividends.toLocaleString(undefined, { minimumFractionDigits: 2 })} MXN</p>
-                            <p className="text-[10px] text-blue-300 flex items-center gap-1"><TrendingUp size={10} /> Tu inversión sigue creciendo 🚀</p>
                         </div>
-                        <div className="text-right">
-                            <p className="text-blue-200 text-[10px] uppercase">Próximo Pago</p>
-                            <p className="text-sm font-bold">{daysUntilPayout} Días</p>
+                        <div className="sm:text-right">
+                            <p className="text-blue-200 text-[10px] uppercase">Próximo Pago: <span className="font-bold text-white">{daysUntilPayout} días</span></p>
                             <p className="text-[10px] text-green-300 font-medium">Est. +${estimatedNextPayout.toLocaleString(undefined, { maximumFractionDigits: 0 })} MXN</p>
                         </div>
                     </div>
 
-                    <div className="flex gap-2">
+                    <div className="flex flex-col sm:flex-row gap-2">
                         <button
                             onClick={() => setShowReinvestModal(true)}
-                            className="flex-1 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white text-xs font-bold px-2 py-2 rounded-lg transition shadow border border-blue-500"
+                            className="flex-1 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white text-sm font-bold px-3 py-2.5 rounded-lg transition shadow border border-blue-500"
                         >
-                            Reinvertir
+                            💰 Reinvertir
                         </button>
                         <button
                             onClick={() => setShowSimModal(true)}
-                            className="flex-1 bg-green-500 hover:bg-green-600 active:scale-95 text-white text-xs font-bold px-2 py-2 rounded-lg transition shadow border border-green-400"
+                            className="flex-1 bg-green-500 hover:bg-green-600 active:scale-95 text-white text-sm font-bold px-3 py-2.5 rounded-lg transition shadow border border-green-400"
                         >
-                            Simular Pago
+                            📊 Simular Pago
                         </button>
                     </div>
                 </div>

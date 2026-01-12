@@ -2,16 +2,30 @@ import React, { useRef, useState, useCallback } from 'react';
 import Webcam from 'react-webcam';
 import { Camera, RefreshCw, Check, Sparkles, AlertCircle } from 'lucide-react';
 
-const videoConstraints = {
-    width: 1280,
-    height: 720,
-    facingMode: "user"
-};
+// Default constraints - forces higher resolution for better OCR
+const getVideoConstraints = (useRearCamera = false) => ({
+    width: { min: 1280, ideal: 1920, max: 4096 },
+    height: { min: 720, ideal: 1080, max: 2160 },
+    aspectRatio: { ideal: 16 / 9 },
+    // Use 'ideal' instead of 'exact' to avoid camera errors on some devices
+    facingMode: useRearCamera
+        ? { ideal: "environment" }  // Prefer rear camera for documents
+        : { ideal: "user" }         // Prefer front camera for selfie
+});
 
-const CameraCapture = ({ onCapture, label, instruction }) => {
+const CameraCapture = ({ onCapture, label, instruction, isDocument = false }) => {
     const webcamRef = useRef(null);
     const [image, setImage] = useState(null);
     const [isCapturing, setIsCapturing] = useState(false);
+    const [cameraError, setCameraError] = useState(false);
+    const [useRearCamera, setUseRearCamera] = useState(isDocument);
+
+    // Dynamic video constraints based on camera selection
+    const videoConstraints = getVideoConstraints(useRearCamera);
+
+    const toggleCamera = () => {
+        setUseRearCamera(!useRearCamera);
+    };
 
     const capture = useCallback(() => {
         setIsCapturing(true);
@@ -42,23 +56,51 @@ const CameraCapture = ({ onCapture, label, instruction }) => {
                 <p className="text-sm text-gray-500 dark:text-gray-400">{instruction}</p>
             </div>
 
-            <div className="relative w-full aspect-[4/3] bg-slate-100 dark:bg-slate-800 rounded-3xl overflow-hidden shadow-2xl border-4 border-white dark:border-slate-800 mb-8 group">
+            <div className={`relative w-full ${isDocument ? 'aspect-[3/2]' : 'aspect-[4/3]'} bg-slate-100 dark:bg-slate-800 rounded-3xl overflow-hidden shadow-2xl border-4 border-white dark:border-slate-800 mb-8 group`}>
                 {!image ? (
                     <>
                         <Webcam
                             audio={false}
-                            height={720}
                             ref={webcamRef}
                             screenshotFormat="image/jpeg"
-                            width={1280}
+                            screenshotQuality={0.98}
                             videoConstraints={videoConstraints}
                             className="w-full h-full object-cover"
+                            onUserMediaError={() => setCameraError(true)}
+                            key={useRearCamera ? 'rear' : 'front'}
                         />
-                        {/* Overlay helpers */}
-                        <div className="absolute inset-0 border-2 border-white/30 rounded-2xl m-6 pointer-events-none" />
-                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 border-2 border-white/20 rounded-full flex items-center justify-center pointer-events-none">
-                            <div className="w-1.5 h-1.5 bg-white/40 rounded-full" />
-                        </div>
+                        {/* Camera Switch Button */}
+                        <button
+                            onClick={toggleCamera}
+                            className="absolute top-4 right-4 z-10 w-10 h-10 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-black/70 transition-colors"
+                            title={useRearCamera ? 'Cambiar a cámara frontal' : 'Cambiar a cámara trasera'}
+                        >
+                            <RefreshCw className="w-5 h-5" />
+                        </button>
+                        {/* INE Document Guide Frame */}
+                        {isDocument ? (
+                            <div className="absolute inset-0 pointer-events-none">
+                                {/* Corner guides */}
+                                <div className="absolute top-4 left-4 w-12 h-12 border-l-4 border-t-4 border-orange-500 rounded-tl-lg" />
+                                <div className="absolute top-4 right-4 w-12 h-12 border-r-4 border-t-4 border-orange-500 rounded-tr-lg" />
+                                <div className="absolute bottom-4 left-4 w-12 h-12 border-l-4 border-b-4 border-orange-500 rounded-bl-lg" />
+                                <div className="absolute bottom-4 right-4 w-12 h-12 border-r-4 border-b-4 border-orange-500 rounded-br-lg" />
+                                {/* Center guide text */}
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                    <div className="bg-black/50 backdrop-blur-sm text-white text-xs px-4 py-2 rounded-full">
+                                        📋 Alinea tu INE dentro del marco
+                                    </div>
+                                </div>
+                                {/* INE card outline */}
+                                <div className="absolute inset-6 border-2 border-dashed border-white/40 rounded-xl" />
+                            </div>
+                        ) : (
+                            /* Selfie guide - face circle */
+                            <>
+                                <div className="absolute inset-0 border-2 border-white/30 rounded-2xl m-6 pointer-events-none" />
+                                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-40 border-2 border-white/40 rounded-full pointer-events-none" />
+                            </>
+                        )}
                     </>
                 ) : (
                     <img src={image} alt="captured" className="w-full h-full object-cover animate-fade-in" />
